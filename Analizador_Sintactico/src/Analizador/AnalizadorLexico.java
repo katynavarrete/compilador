@@ -58,13 +58,8 @@ public class AnalizadorLexico
        
         if(letra1 != -1 && ind < fr.length())
         {
-<<<<<<< HEAD
-           // System.out.println("indice "+ind+" total "+fr.length());
-           // System.out.println("linea "+linea);
-=======
-            
-            
->>>>>>> master
+
+
             switch(letra) 
             {
                 case ';': 
@@ -306,6 +301,7 @@ public class AnalizadorLexico
         palabrasReservadas.put("and","token_and#" );
         palabrasReservadas.put("or","token_or#");
         palabrasReservadas.put("not","token_not#");
+        palabrasReservadas.put("if","token_if#");
         
         
     }

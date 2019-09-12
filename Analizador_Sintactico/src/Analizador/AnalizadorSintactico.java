@@ -25,7 +25,7 @@ import java.io.IOException;
            
             //AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             AnalizadorLexico lexico = new 
-AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\ejemplo_2.pas");
+AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\param.pas");
             inicio(lexico);
             lexico.cerrarArchivo();
            
@@ -40,7 +40,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         //System.out.println("INICIO");
         linea =  lexico.pedirToken().split("#");
         preanalisis = linea[0];
-        System.out.println("token "+preanalisis);
+        //System.out.println("token "+preanalisis);
         if(preanalisis.equalsIgnoreCase("token_program"))
 	{
             match("token_program",lexico);
@@ -229,7 +229,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
             String aux = lexico.pedirToken();
             linea=aux .split("#");
             preanalisis = linea[0];
-           
+          //  System.out.println(preanalisis+" "+linea[2]);
             if(terminal.equalsIgnoreCase("punto"))
             {
                 if(preanalisis.equalsIgnoreCase(""))
@@ -330,7 +330,9 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
             }
             while(preanalisis.equalsIgnoreCase("punto_y_coma"))
             {
+              
 		match("punto_y_coma",lexico);
+                System.out.println("llama a sentencia simple con "+preanalisis);
 		if(preanalisis.equalsIgnoreCase("token_if")  ||  preanalisis.equalsIgnoreCase("token_read")  || 
                     preanalisis.equalsIgnoreCase("token_write")  ||  preanalisis.equalsIgnoreCase("token_while")  || 
                     preanalisis.equalsIgnoreCase("id"))
@@ -342,10 +344,12 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
                     if(preanalisis.equalsIgnoreCase("token_begin"))
                         sentencia_compuesta(lexico);
 		}
+                System.out.println("sale  con "+ preanalisis);
             }
            // sentencia_simple(lexico);
-            if (preanalisis.equalsIgnoreCase("punto_y_coma"))  
-                match("punto_y_coma",lexico);
+         /*   if (preanalisis.equalsIgnoreCase("punto_y_coma"))  
+                match("punto_y_coma",lexico);*/
+           
             match("token_end",lexico);
 	}
         else
