@@ -19,14 +19,16 @@ Begin
 
   pru2( a+b*2 );
 
-  if r2>3 then
-  begin
-     write(1);
-     a:= b
-  end
-  else
-     write(0);
+ if r2>3 then
+    begin 
+        write(1);
+        a:=5;
+    end
+else
+   begin
+    read(x);
+    end;
+A:=x>5;
+a:=b;
 
-  algofinal:= 88
-
-End.
+END.

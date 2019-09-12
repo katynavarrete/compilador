@@ -12,6 +12,8 @@ import java.io.IOException;
 
 /**
  *
+ * 
+ * posiblemente el error en sentencia compuesta sea culpa del manejo de los puntos 
  * @author PC
  */
  public class AnalizadorSintactico 
@@ -25,7 +27,7 @@ import java.io.IOException;
            
             //AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             AnalizadorLexico lexico = new 
-AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\param.pas");
+AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\ejemplo_2.pas");
             inicio(lexico);
             lexico.cerrarArchivo();
            
@@ -251,6 +253,12 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         }
         else
         {
+            if(terminal.equalsIgnoreCase("token_end"))
+            {
+                System.out.println("Error sintactico en la linea "+linea[1] + " se espera una expresion, end o ; y se recibe "+linea[2]);
+            }
+            else
+                
             System.out.println("Error sintactico en la linea "+linea[1] + " se espera "+terminal+" y se recibe "+linea[2]);
             //System exit corta la ejecuion del main  0 es de manera exitosa y 1 significa que ubo algun error 
             lexico.cerrarArchivo();
@@ -332,7 +340,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
             {
               
 		match("punto_y_coma",lexico);
-                System.out.println("llama a sentencia simple con "+preanalisis);
+              
 		if(preanalisis.equalsIgnoreCase("token_if")  ||  preanalisis.equalsIgnoreCase("token_read")  || 
                     preanalisis.equalsIgnoreCase("token_write")  ||  preanalisis.equalsIgnoreCase("token_while")  || 
                     preanalisis.equalsIgnoreCase("id"))
@@ -344,7 +352,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
                     if(preanalisis.equalsIgnoreCase("token_begin"))
                         sentencia_compuesta(lexico);
 		}
-                System.out.println("sale  con "+ preanalisis);
+               
             }
            // sentencia_simple(lexico);
          /*   if (preanalisis.equalsIgnoreCase("punto_y_coma"))  
@@ -392,7 +400,9 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         {
             if(preanalisis.equalsIgnoreCase("token_begin"))
             {
+                
                 sentencia_compuesta(lexico);
+               
                 sent_condicional3(lexico);
             }
             else
@@ -412,10 +422,9 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         //System.out.println("SENT_CONDICIONAL2");
 	switch(preanalisis)
 	{
-		case "punto_y_coma" :
-			match("punto_y_coma",lexico);
-		break;
+		
 		case  "token_else" :
+                        
 			match("token_else",lexico);
 			sent_condicional4(lexico);
 		break;
@@ -439,7 +448,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
 	    if(preanalisis.equalsIgnoreCase("token_begin"))
 	    {
                 sentencia_compuesta(lexico);
-		match("punto_y_coma",lexico);
+		//match("punto_y_coma",lexico);
 	    }
             else
             {
@@ -456,8 +465,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
  public static   void sent_condicional5(AnalizadorLexico lexico) throws IOException
 {
     //System.out.println("SENT_CONDICIONAL5");
-    if(preanalisis.equalsIgnoreCase("punto_y_coma"))
-	match("punto_y_coma",lexico);
+  /*  if(preanalisis.equalsIgnoreCase("punto_y_coma"))
+	match("punto_y_coma",lexico);*/
 }
 
 
@@ -465,7 +474,10 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
 
       //  System.out.println("SENT_CONDICIONAL3");
 	if(preanalisis.equalsIgnoreCase("punto_y_coma"))
-		match("punto_y_coma",lexico);
+        {
+		//match("punto_y_coma",lexico);
+               
+        }
 	else
 	{
 	       if(preanalisis.equalsIgnoreCase("token_else"))
