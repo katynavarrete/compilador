@@ -54,84 +54,89 @@ public class AnalizadorLexico
         char letra =(char)letra1;
         String token = "";
         error = false;
-       // System.out.println(linea);
+
        
         if(letra1 != -1 && ind < fr.length())
         {
+<<<<<<< HEAD
            // System.out.println("indice "+ind+" total "+fr.length());
            // System.out.println("linea "+linea);
+=======
+            
+            
+>>>>>>> master
             switch(letra) 
             {
                 case ';': 
-                    token = "punto_y_coma#"+linea;
+                    token = "punto_y_coma#"+linea+"#"+letra;
                 break;
                 case '(': 
-                    token = "parent_abre#"+linea;
+                    token = "parent_abre#"+linea+"#"+letra;
                 break;
                 case ')': 
-                    token = "parent_cierra#"+linea;
+                    token = "parent_cierra#"+linea+"#"+letra;
                 break;
                 case ',': 
-                    token = "coma#"+linea;
+                    token = "coma#"+linea+"#"+letra;
                 break;
                 case '.': 
-                    token = "punto#"+linea;
+                    token = "punto#"+linea+"#"+letra;
                 break;
                 case '+': 
-                    token = "token_suma#"+linea;
+                    token = "token_suma#"+linea+"#"+letra;
                 break;
                 case '-': 
-                    token = "token_resta#"+linea;
+                    token = "token_resta#"+linea+"#"+letra;
                 break;
                 case '*': 
-                    token = "token_multi#"+linea;
+                    token = "token_multi#"+linea+"#"+letra;
                 break;
                 case '/': 
-                    token = "token_div#"+linea;
+                    token = "token_div#"+linea+"#"+letra;
                 break;
                 case '=':
-                    token = "token_igual#"+linea;
+                    token = "token_igual#"+linea+"#"+letra;
                 break;
                 case '<': 
                     char t = (char)fr.read();
                     if( t == '=')
                     {
-                        token = "token_menorI#"+linea;
+                        token = "token_menorI#"+linea+"#<=";
                         ind++;
                     }
                     else
                     {
                         if( t == '>')
                         {
-                            token = "token_distinto#"+linea;
+                            token = "token_distinto#"+linea+"#<>";
                             ind++;
                         }
                         else
-                            token = "token_menor#"+linea;
+                            token = "token_menor#"+linea+"#<";
                     }
                        
                 break;
                 case '>': 
                     if( (char)fr.read() == '=')
                     {
-                        token = "token_mayorI#"+linea;
+                        token = "token_mayorI#"+linea+"#>=";
                         ind++;
                     }
                     else
                     {
-                        token = "token_mayor#"+linea;
+                        token = "token_mayor#"+linea+"#>";
                     }
                 break;
                 
                 case ':': 
                     if((char)fr.read() == '=')
                     {
-                        token = "asignacion#"+linea;
+                        token = "asignacion#"+linea+"#:=";
                         ind++;
                     }
                     else
                     {
-                        token = "dos_puntos#"+linea;
+                        token = "dos_puntos#"+linea+"#:";
                     }
                 break;
                 case '{': 
@@ -148,7 +153,7 @@ public class AnalizadorLexico
                             posicion=0;
                         }    
                         ind++;
-                      //  System.out.println(aux);
+                      
                         aux = fr.read();
                         
                     } 
@@ -162,11 +167,11 @@ public class AnalizadorLexico
                     {
                         if((char)aux == '}')
                         {
-                      // System.out.println("encontro la llave que termina "+linea);
+                      
                         ind++;
                         token = this.pedirToken();
                         ind--;
-                        //System.out.println("***********"+token+" "+letra1);
+                        
                         }
                     }
                    // ind++;
@@ -221,7 +226,7 @@ public class AnalizadorLexico
                     //Si no se lee un 'enter', cuyo ASCII es 13, se invoca al método que reconoce palabras, ya que 
                     //no se ha cambiado de línea
                     {
-                        //System.out.println("entro a reconocer con "+letra);
+                        
                         token=reconocerPalabras();
                     }
                     else
@@ -232,7 +237,7 @@ public class AnalizadorLexico
                         //se inicializa la posición en 0 porque no se ha leído ningun caracter
                         if(letra1 == 13 || letra1==10)
                         {
-                           // System.out.println("ENTER");
+                            
                             ind++;
                             //letra1 = fr.read();
                             if(letra1==10)
@@ -276,7 +281,7 @@ public class AnalizadorLexico
         {
             this.cerrarArchivo();
         }
-        //System.out.println("token "+token);
+        
         return token;         
     }
     
@@ -361,19 +366,18 @@ public class AnalizadorLexico
        
         if(!error && palabrasReservadas.containsKey(palabra.toLowerCase()))
         {
-            token = (String)palabrasReservadas.get(palabra.toLowerCase())+linea;
+            token = (String)palabrasReservadas.get(palabra.toLowerCase())+linea+"#"+palabra;
         }
         else
         {
             if(!palabra.equalsIgnoreCase("") && !error)
             {
                 token = "id#"+linea+"#"+palabra;
-             //   System.out.println("palabra "+palabra);
+             
             }
         }
         ind--;
-       // System.out.println(ind);
-        //System.out.println("token "+token);
+       
         return token;
     } 
     
@@ -392,7 +396,7 @@ public class AnalizadorLexico
             dig=(char)aux;
             ind++;
         }
-        token = "token_num#"+linea;
+        token = "token_num#"+linea+"#"+num;
         ind--;
         return token;
     }
