@@ -88,7 +88,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
 	else
 	{
           //  System.out.println("ERROR EN EL DEF_VARIABLE");
-            System.out.println("Error sintactico en la linea "+linea[1]+"se espera VAR y se recibe "+preanalisis);
+            System.out.println("Error sintactico en la linea "+linea[1]+"se espera VAR y se recibe "+linea[2]);
            System.exit(0);
 	}
    }
@@ -211,7 +211,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
                 default: 
                 {
           //          System.out.println("ERROR EN EL SUBPROGRAMA");
-                    System.out.println("Error de sintaxis en la linea "+linea[1]+" se espera procedure o fuction y se recibe "+preanalisis);
+                    System.out.println("Error de sintaxis en la linea "+linea[1]
+                            +" se espera procedure o fuction y se recibe "+linea[2]);
                    System.exit(0);
                 }    
 		break;
@@ -234,7 +235,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
                 if(preanalisis.equalsIgnoreCase(""))
                     System.out.println("NO SE DECTARON ERRORES SINTACTICO ");
                 else
-                    System.out.println("ERROR SINTACTICO EN LA LINEA "+linea[1]+" se encontraron lineas de codigo luego de un punto");
+                    System.out.println("ERROR SINTACTICO EN LA LINEA "+linea[1]
+                            +" se encontraron lineas de codigo luego de un punto");
             }
             else
             {
@@ -249,7 +251,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         }
         else
         {
-            System.out.println("Error sintactico en la linea "+linea[1] + " se espera "+terminal+" y se recibe "+preanalisis);
+            System.out.println("Error sintactico en la linea "+linea[1] + " se espera "+terminal+" y se recibe "+linea[2]);
             //System exit corta la ejecuion del main  0 es de manera exitosa y 1 significa que ubo algun error 
             lexico.cerrarArchivo();
            System.exit(0);
@@ -280,7 +282,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
             default: 
             //    System.out.println("ERROR EN EL SENTENCIA_SIMPLE");
                 System.out.println("Error de sintaxis en la linea "+linea[1] 
-                        +" se espera UN IF O WRITE O READ O WHILE O UN ID y se recibe "+preanalisis );
+                        +" se espera UN IF O WRITE O READ O WHILE O UN ID y se recibe "+linea[2] );
                System.exit(0);
             break;
         }
@@ -349,7 +351,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         else
         {
           //  System.out.println("ERROR EN SENTENCIA COMPUESTA");
-            System.out.println("Error de sintaxis en la linea "+linea[1] +" se espera BEGIN y se recibe "+preanalisis);
+            System.out.println("Error de sintaxis en la linea "+linea[1] +" se espera BEGIN y se recibe "+linea[2]);
             System.exit(0);
         }    
 }
@@ -367,7 +369,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         else
         {
           //  System.out.println("ERROR EN EL SENT_CONDICIONAL");
-	    System.out.println("Error de sintaxis en la linea "+linea[1] +" se espera IF y se recibe "+preanalisis);
+	    System.out.println("Error de sintaxis en la linea "+linea[1] +" se espera IF y se recibe "+linea[2]);
            System.exit(0);
         }  
     }
@@ -392,7 +394,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
             else
             {
           //      System.out.println("ERROR EN sent_condicional1");
-                System.out.println("Error de sintaxis en la linea "+linea[1] +" se espera IF, READ, WRITE,WHILE O BEGIN y se recibe "+preanalisis);
+                System.out.println("Error de sintaxis en la linea "+linea[1] 
+                        +" se espera IF, READ, WRITE,WHILE O BEGIN y se recibe "+linea[2]);
                System.exit(0);
             }
         }
@@ -437,7 +440,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
             else
             {
          //       System.out.println("ERROR EN SENT_CONDICIONAL4");
-                System.out.println("Error de sintaxis en la linea " +linea[1]+"se espera IF, READ, WRITE, WHILE, ID O BEGIN y se recibe "+preanalisis);
+                System.out.println("Error de sintaxis en la linea " +linea[1]
+                        +"se espera IF, READ, WRITE, WHILE, ID O BEGIN y se recibe "+linea[2]);
                System.exit(0);
             }
             
@@ -468,7 +472,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
                else
                {
         //           System.out.println("ERROR EN SENT_CONDICIONAL3");
-		    System.out.println("Error de sintaxis  en la linea "+linea[1]+" se espera ; O ELSE y se recibe "+preanalisis);
+		    System.out.println("Error de sintaxis  en la linea "+linea[1]
+                            +" se espera ; O ELSE y se recibe "+linea[2]);
                    System.exit(0);
                }
                
@@ -501,7 +506,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
        else
        {
       //     System.out.println("ERROR EN SENT_REPETITIVA");
-	       System.out.println("Error de sintaxis en la linea "+linea[1]+" se espera WHILE y se recibe "+preanalisis);
+	       System.out.println("Error de sintaxis en la linea "+linea[1]+" se espera WHILE y se recibe "+linea[2]);
               System.exit(0);
        }       
 }
@@ -530,7 +535,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
                {
                    
       //          System.out.println("ERROR EN SENT_CONDICIONAL4");
-                System.out.println("Error de sintaxis en la linea "+linea[1] +" se espera WRITE O READ y se recibe "+preanalisis);
+                System.out.println("Error de sintaxis en la linea "+linea[1] 
+                        +" se espera WRITE O READ y se recibe "+linea[2]);
                System.exit(0);
                }
         }       
@@ -549,7 +555,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
      else
      {
       //   System.out.println("ERROR EN EXPRESION");
-	       System.out.println("Error de sintaxis en la linea "+linea[1] +" se espera TRUE, FALSE, -, NUM, ID, ( o NOT y se recibe "+preanalisis);
+	       System.out.println("Error de sintaxis en la linea "+linea[1]
+                       +" se espera TRUE, FALSE, -, NUM, ID, ( o NOT y se recibe "+linea[2]);
               System.exit(0);
      }
  }     
@@ -578,7 +585,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
      else
      {
      //    System.out.println("ERROR EN EXP1");
-         System.out.println("Error de sintaxis en la linea "+linea[1] +" se espera NOT, TRUE, FALSE, -, NUM, ID O ( y se recibe "+preanalisis);
+         System.out.println("Error de sintaxis en la linea "+linea[1]
+                 +" se espera NOT, TRUE, FALSE, -, NUM, ID O ( y se recibe "+linea[2]);
 	System.exit(0);
      }
          
@@ -614,7 +622,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
               else
               {
      //            System.out.println("ERROR EN EXP2");
-		     System.out.println("Error de sintaxis en la linea "+linea[1]+" se espera NOT, TRUE, FALSE,- NUM,ID O ( y se recibe "+preanalisis);
+		     System.out.println("Error de sintaxis en la linea "+linea[1]
+                             +" se espera NOT, TRUE, FALSE,- NUM,ID O ( y se recibe "+linea[2]);
                     System.exit(0);
               }
         }      
@@ -634,7 +643,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
      else
      {
        //  System.out.println("ERROR EN EXP3");
-	       System.out.println("Error de sintaxis  en la linea "+linea[1]+" se espera TRUE, FALSE, -, NUM, ID O ( y se recibe "+preanalisis);
+	       System.out.println("Error de sintaxis  en la linea "+linea[1]
+                       +" se espera TRUE, FALSE, -, NUM, ID O ( y se recibe "+linea[2]);
               System.exit(0);
      }
  }     
@@ -677,7 +687,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
     else
     {
     //    System.out.println("ERROR EN EXP4");
-	       System.out.println("Error de sintaxis  en la linea "+linea[1]+ " se espera TRUE, FALSE,-, NUM, ID O ( y se recibe "+preanalisis);
+	       System.out.println("Error de sintaxis  en la linea "+linea[1]
+                       + " se espera TRUE, FALSE,-, NUM, ID O ( y se recibe "+linea[2]);
               System.exit(0);
     }
     
@@ -717,7 +728,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
     else
     {
        // System.out.println("ERROR EN TERMINO");
-	System.out.println("Error de sintaxis en la linea " +linea[1]+" se espera TRUE, FALSE, -, NUM, ID,( y se recibe " + preanalisis);
+	System.out.println("Error de sintaxis en la linea " +linea[1]
+                +" se espera TRUE, FALSE, -, NUM, ID,( y se recibe " + linea[2]);
        System.exit(0);
     }
 }    
@@ -773,7 +785,8 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
 	break;
 	default: 
       //      System.out.println("ERROR EN FACTOR");
-            System.out.println("Error de sintaxis en la linea "+linea[1]+" se espera: TRUE, FALSE, -, NUM, ID,( y se recibe "+preanalisis);
+            System.out.println("Error de sintaxis en la linea "+linea[1]
+                    +" se espera: TRUE, FALSE, -, NUM, ID,( y se recibe "+linea[2]);
            System.exit(0);
             break;
     }
@@ -798,7 +811,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
 	break;
 	default:
           // System.out.println("ERROR EN factor1");
-           System.out.println("Error de sintaxis en la linea "+linea[1]+" se espera  NUM, ID,( y se recibe "+preanalisis);
+           System.out.println("Error de sintaxis en la linea "+linea[1]+" se espera  NUM, ID,( y se recibe "+linea[2]);
           System.exit(0);
            break;
     }
@@ -833,7 +846,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
 	break;
 	default:
       //      System.out.println("ERROR EN tipo");
-            System.out.println("Error de sintaxis en la linea " +linea[1]+" se espera un TIPO y se recibe "+preanalisis);
+            System.out.println("Error de sintaxis en la linea " +linea[1]+" se espera un TIPO y se recibe "+linea[2]);
            System.exit(0);
             break;
     }

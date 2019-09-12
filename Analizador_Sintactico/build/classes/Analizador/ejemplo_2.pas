@@ -1,8 +1,14 @@
 ﻿
 
-PROGRAM {EJE %%%%% @@@@@@ }R02;
+PROGRAM {EJE %%%%%
+
+
+ @@@@@@ }R02;
         VAR lado1,lado2:INTEGER;
         
+
+
+
 VAR area:INTEGER;
 
 

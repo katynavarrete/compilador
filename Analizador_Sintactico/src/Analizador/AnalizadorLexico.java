@@ -59,7 +59,7 @@ public class AnalizadorLexico
         if(letra1 != -1 && ind < fr.length())
         {
            // System.out.println("indice "+ind+" total "+fr.length());
-           // System.out.println("letra "+letra);
+           // System.out.println("linea "+linea);
             switch(letra) 
             {
                 case ';': 
@@ -141,7 +141,7 @@ public class AnalizadorLexico
                     ind++;
                     while((char)aux != '}' && aux != -1)
                     {
-                        if(aux == 13)
+                        if(aux == 10)
                         {
                            
                             linea++;
@@ -235,7 +235,7 @@ public class AnalizadorLexico
                            // System.out.println("ENTER");
                             ind++;
                             //letra1 = fr.read();
-                            if(letra==13)
+                            if(letra1==10)
                             {
                               
                                 linea++;
