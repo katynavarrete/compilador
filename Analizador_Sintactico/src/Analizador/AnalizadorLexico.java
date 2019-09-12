@@ -54,7 +54,7 @@ public class AnalizadorLexico
         char letra =(char)letra1;
         String token = "";
         error = false;
-//        System.out.println(linea);
+
        
         if(letra1 != -1 && ind < fr.length())
         {
@@ -148,7 +148,7 @@ public class AnalizadorLexico
                             posicion=0;
                         }    
                         ind++;
-                      //  System.out.println(aux);
+                      
                         aux = fr.read();
                         
                     } 
@@ -162,11 +162,11 @@ public class AnalizadorLexico
                     {
                         if((char)aux == '}')
                         {
-                      // System.out.println("encontro la llave que termina "+linea);
+                      
                         ind++;
                         token = this.pedirToken();
                         ind--;
-                        //System.out.println("***********"+token+" "+letra1);
+                        
                         }
                     }
                    // ind++;
@@ -221,7 +221,7 @@ public class AnalizadorLexico
                     //Si no se lee un 'enter', cuyo ASCII es 13, se invoca al método que reconoce palabras, ya que 
                     //no se ha cambiado de línea
                     {
-                        //System.out.println("entro a reconocer con "+letra);
+                        
                         token=reconocerPalabras();
                     }
                     else
@@ -232,7 +232,7 @@ public class AnalizadorLexico
                         //se inicializa la posición en 0 porque no se ha leído ningun caracter
                         if(letra1 == 13 || letra1==10)
                         {
-                            System.out.println(letra1);
+                            
                             ind++;
                             //letra1 = fr.read();
                             if(letra1==10)
@@ -276,7 +276,7 @@ public class AnalizadorLexico
         {
             this.cerrarArchivo();
         }
-        //System.out.println("token "+token);
+        
         return token;         
     }
     
