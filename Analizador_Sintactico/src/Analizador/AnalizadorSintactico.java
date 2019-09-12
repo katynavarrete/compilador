@@ -27,7 +27,7 @@ import java.io.IOException;
            
             //AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             AnalizadorLexico lexico = new 
-AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\ejemplo_2.pas");
+AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\param.pas");
             inicio(lexico);
             lexico.cerrarArchivo();
            
@@ -351,6 +351,11 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
 		{
                     if(preanalisis.equalsIgnoreCase("token_begin"))
                         sentencia_compuesta(lexico);
+                    else
+                    {
+                        System.out.println("ERROR SINTACTICO se encontraron dos ; seguidos "+linea[1]);
+                        System.exit(0);
+                    }
 		}
                
             }

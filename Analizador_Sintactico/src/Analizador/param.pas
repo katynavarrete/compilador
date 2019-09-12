@@ -22,12 +22,12 @@ Begin
  if r2>3 then
     begin 
         write(1);
-        a:=5;
+        a:=5
     end
-else
+else begin
    begin
     read(x);
-    end;
+    end; end;
 A:=x>5;
 a:=b;
 
