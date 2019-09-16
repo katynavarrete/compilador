@@ -255,7 +255,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         {
             if(terminal.equalsIgnoreCase("token_end"))
             {
-                System.out.println("Error sintactico en la linea "+linea[1] + " se espera una expresion, end o ; y se recibe "+linea[2]);
+                System.out.println("Error sintactico en la linea "+linea[1] + " se espera un end y se recibe "+linea[2]);
             }
             else
                 
@@ -325,43 +325,23 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         //System.out.println("SENTENCIA_COMPUESTA");
         if(preanalisis.equalsIgnoreCase("token_begin"))
 	{
+            boolean seguir = true;
             match("token_begin",lexico); 
-            if(preanalisis.equalsIgnoreCase("token_if")  ||  preanalisis.equalsIgnoreCase("token_read")  ||  
+            while((preanalisis.equalsIgnoreCase("token_if")  ||  preanalisis.equalsIgnoreCase("token_read")  ||  
 	       preanalisis.equalsIgnoreCase("token_write")  ||  preanalisis.equalsIgnoreCase("token_while")  ||
-	       preanalisis.equalsIgnoreCase("id"))
+	       preanalisis.equalsIgnoreCase("id") || preanalisis.equalsIgnoreCase("token_begin"))&&seguir)
             {
-                sentencia_simple(lexico);
-            }
-            else
-            {
-                sentencia_compuesta(lexico);
-            }
-            while(preanalisis.equalsIgnoreCase("punto_y_coma"))
-            {
-              
-		match("punto_y_coma",lexico);
-              
-		if(preanalisis.equalsIgnoreCase("token_if")  ||  preanalisis.equalsIgnoreCase("token_read")  || 
-                    preanalisis.equalsIgnoreCase("token_write")  ||  preanalisis.equalsIgnoreCase("token_while")  || 
-                    preanalisis.equalsIgnoreCase("id"))
-		{
+                if(preanalisis.equalsIgnoreCase("token_begin"))
+                    sentencia_compuesta(lexico);
+                else
                     sentencia_simple(lexico);
-		}
-		else
-		{
-                    if(preanalisis.equalsIgnoreCase("token_begin"))
-                        sentencia_compuesta(lexico);
-                    else
-                    {
-                        System.out.println("ERROR SINTACTICO se encontraron dos ; seguidos "+linea[1]);
-                        System.exit(0);
-                    }
-		}
-               
+                if(preanalisis.equalsIgnoreCase("punto_y_coma"))
+                    
+                    match("punto_y_coma",lexico);
+                else
+                   seguir = false;
             }
-           // sentencia_simple(lexico);
-         /*   if (preanalisis.equalsIgnoreCase("punto_y_coma"))  
-                match("punto_y_coma",lexico);*/
+          
            
             match("token_end",lexico);
 	}
