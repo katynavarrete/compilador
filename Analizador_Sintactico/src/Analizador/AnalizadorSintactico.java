@@ -226,8 +226,6 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         
         if(terminal.equalsIgnoreCase(preanalisis))
         {
-            
-            
             String aux = lexico.pedirToken();
             linea=aux .split("#");
             preanalisis = linea[0];
@@ -242,25 +240,43 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
             }
             else
             {
-                if(preanalisis.equalsIgnoreCase("error") ||preanalisis.equalsIgnoreCase("") )
+                if(preanalisis.equalsIgnoreCase("error") )
                 {
                
                     lexico.cerrarArchivo();
+                    
                     System.exit(0);
                 
                 }
+              /*  else
+                {
+                    if(preanalisis.equalsIgnoreCase(""))
+                    {
+                        System.out.println("ERROR SINTACTICO se espera "+terminal+" "+lexico.getLinea());
+                         System.exit(0);
+                    }
+                }*/
             }  
         }
         else
         {
             if(terminal.equalsIgnoreCase("token_end"))
             {
-                System.out.println("Error sintactico en la linea "+linea[1] + " se espera un end y se recibe "+linea[2]);
+                System.out.println("Error sintactico en la linea "+linea[1] + " se espera una expresion, end");
             }
             else
-                
-            System.out.println("Error sintactico en la linea "+linea[1] + " se espera "+terminal+" y se recibe "+linea[2]);
+            {
+                 if(preanalisis.equalsIgnoreCase(""))
+                    {
+                        System.out.println("ERROR SINTACTICO se espera "+terminal+" "+lexico.getLinea());
+                         System.exit(0);
+                    }
+                 else
+                     System.out.println("Error sintactico en la linea "+linea[1] + " se espera "+terminal+" y se recibe "+linea[2]);
             //System exit corta la ejecuion del main  0 es de manera exitosa y 1 significa que ubo algun error 
+            
+            
+            }
             lexico.cerrarArchivo();
            System.exit(0);
         }
@@ -325,6 +341,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         //System.out.println("SENTENCIA_COMPUESTA");
         if(preanalisis.equalsIgnoreCase("token_begin"))
 	{
+            
             boolean seguir = true;
             match("token_begin",lexico); 
             while((preanalisis.equalsIgnoreCase("token_if")  ||  preanalisis.equalsIgnoreCase("token_read")  ||  
@@ -341,9 +358,30 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
                 else
                    seguir = false;
             }
-          
-           
-            match("token_end",lexico);
+          /**
+           * como mandar los msj de errores para cuando hay expresion sin ; seguida de otra exp
+           * 
+           */
+          if(!seguir && !preanalisis.equalsIgnoreCase("token_end"))
+          {
+              if(preanalisis.equalsIgnoreCase("punto_y_coma"))
+              {
+                  System.out.println("ERROR SINTACTICO EN LA LINEA "+linea[1]+" se espera expresion o un end");
+                  System.exit(0);
+              }
+              else
+              {
+                  System.out.println("ERROR SINTACTICO EN LA LINEA "+linea[1]+" se espera ; o  end");
+                  System.exit(0);
+              }
+                  
+          }    
+          else
+          {
+              
+              match("token_end",lexico);
+              
+          }
 	}
         else
         {
@@ -668,7 +706,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
 		if(preanalisis.equalsIgnoreCase("token_mayorI"))
 			match("token_mayorI",lexico);
 		if(preanalisis.equalsIgnoreCase("token_distinto"))
-			match("token_ditinto",lexico);
+			match("token_distinto",lexico);
 		exp4(lexico);
 		exp31(lexico);
         }

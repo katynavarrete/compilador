@@ -279,7 +279,10 @@ public class AnalizadorLexico
         
         return token;         
     }
-    
+    public int getLinea()
+    {
+        return linea;
+    }
     public void cargarPalabras() 
     {
         palabrasReservadas.put("program","token_program#");

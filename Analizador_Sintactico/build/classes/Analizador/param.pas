@@ -15,6 +15,7 @@ end;
 
 Begin
   read(c);
+
   r2:= 66=55;
 
   pru2( a+b*2 );
@@ -22,13 +23,13 @@ Begin
  if r2>3 then
     begin 
         write(1);
-        a:=5;;
+        a:=5;
     end
 else begin
    begin
+ x := a <> b;
     read(x);
     end; end;
 A:=x > 5;
 a:=b;
-
-END.
+end.
