@@ -1,12 +1,19 @@
-program prueba ;
+program  algo ;
 var
  a, b: BOOLEAN;
-function algo( x: integer; b: boolean):boolean; 
+function algo: boolean; 
  begin 
     x := 10;
  end;
 begin
-A:= B + false;
-read(a );
+pru:= 3 <> 7;
+if 5 then 
+read(a)
+else
+ a := 5>4;
+b:= a>4;
+algo;
+
 end.
+
  

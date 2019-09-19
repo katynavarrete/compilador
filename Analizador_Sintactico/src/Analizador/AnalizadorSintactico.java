@@ -8,26 +8,28 @@ package Analizador;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.HashMap;
 
 
 /**
  *
  * 
- * posiblemente el error en sentencia compuesta sea culpa del manejo de los puntos 
  * @author PC
  */
  public class AnalizadorSintactico 
 {
      public static String preanalisis;
      public static String[] linea;
+     
      public  static void main(String args[]) throws IOException
     {
+       
      //  if(args.length == 1)
        {
            
             //AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             AnalizadorLexico lexico = new 
-AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\param.pas");
+AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\test.pas");
             inicio(lexico);
             lexico.cerrarArchivo();
            
@@ -39,6 +41,7 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
     }
     public static void inicio(AnalizadorLexico lexico) throws IOException
     {
+        
         //System.out.println("INICIO");
         linea =  lexico.pedirToken().split("#");
         preanalisis = linea[0];
@@ -262,20 +265,20 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
         {
             if(terminal.equalsIgnoreCase("token_end"))
             {
-                System.out.println("Error sintactico en la linea "+linea[1] + " se espera una expresion, end");
+                System.out.println("Error sintactico en la linea "+linea[1] + " se espera una expresion y se recibe  end");
             }
             else
             {
-                 if(preanalisis.equalsIgnoreCase(""))
-                    {
+                if(preanalisis.equalsIgnoreCase(""))
+                   {
                         System.out.println("ERROR SINTACTICO se espera "+terminal+" "+lexico.getLinea());
                          System.exit(0);
                     }
-                 else
-                     System.out.println("Error sintactico en la linea "+linea[1] + " se espera "+terminal+" y se recibe "+linea[2]);
-            //System exit corta la ejecuion del main  0 es de manera exitosa y 1 significa que ubo algun error 
+                else
+                {
+                    System.out.println("Error sintactico en la linea "+linea[1] + " se espera "+terminal+" y se recibe "+linea[2]);
             
-            
+                }
             }
             lexico.cerrarArchivo();
            System.exit(0);
@@ -890,5 +893,6 @@ AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactic
             break;
     }
 }
+
 }
 
