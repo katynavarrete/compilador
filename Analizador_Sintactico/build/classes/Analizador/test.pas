@@ -1,10 +1,18 @@
 program  algo ;
 var
- a, b: BOOLEAN;
-function algo: boolean; 
+    a, b: BOOLEAN;
+    z: Integer;
+
+function algo1(a: integer): boolean; 
  begin 
-    x := 10;
+    b := a + 10;
+    
  end;
+  function c:integer;
+      var m :boolean;
+      begin
+        a :=7;
+      end;
 begin
 pru:= 3 <> 7;
 if 5 then 

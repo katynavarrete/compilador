@@ -24,20 +24,20 @@ import java.util.HashMap;
      public  static void main(String args[]) throws IOException
     {
        
-     //  if(args.length == 1)
+      // if(args.length == 1)
        {
            
-            //AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
+         //   AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             AnalizadorLexico lexico = new 
-AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\test.pas");
+                AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\test.pas");
             inicio(lexico);
             lexico.cerrarArchivo();
            
        }
-      /** else
-       {
-           System.out.println("Falta el parametro del archivo");
-       }*/
+//       else
+//       {
+//           System.out.println("Falta el parametro del archivo");
+//       }
     }
     public static void inicio(AnalizadorLexico lexico) throws IOException
     {
