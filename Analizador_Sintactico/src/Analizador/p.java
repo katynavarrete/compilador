@@ -13,23 +13,35 @@ import java.util.HashMap;
  */
 public class p
 {
-    public static void main(String[] args) {
-        HashMap h = new HashMap();
+    public static void main(String[] args) 
+    {
+        String preanalisis = "token_integer";
+         int pos = preanalisis.lastIndexOf('_');
+         
+         
+                String nomTipo = preanalisis.substring(pos+1);
+                System.out.println(nomTipo);
+        Tabla_de_Simbolos t = new Tabla_de_Simbolos();
+        t.insertarElem("a#1#variable#integer");
+        t.insertarElem("b#1#variable#integer");
+        t.insertarElem("c#1#variable#integer");
+        t.insertarElem("d#1#variable#integer");
+        //falta ver como manejar la cant de parametros
         
-        h.put("02", "hola");
-        h.put("03", "chao");
-        h.put("01", "tres");
+        t.insertarElem("f#1#funcion##boolean");
         
-       
-        
-        boolean existe = false;
-        int i = 0;
-        while(!existe)
-        {
-            System.out.println("existe ");
-            if(i== 5)
-                existe=true;
-            i++;
-        }
+        //t.imprimir();
+//        System.out.println("------------------------------------------");
+//        t.insertarTS();
+//        t.insertarElem("a#1#variable#integer");
+//        t.insertarElem("b#1#variable#integer");
+//        t.insertarElem("c#1#variable#integer");
+//        t.insertarElem("d#1#variable#integer");
+//        
+//        //t.insertarElem("c#1#procedimiento#a&v&c");
+//        t.imprimir();
+//        System.out.println("------------------------------------------");
+//        t.eliminarTS();
+//        t.imprimir();
     }
 }

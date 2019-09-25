@@ -12,7 +12,7 @@ import java.util.ArrayList;
  *
  * @author PC
  */
-public class Tipo 
+public class Atributos 
 {
     private String nombre;
     private String Alcance;
@@ -22,7 +22,7 @@ public class Tipo
     //ver si es necesario que la parametros tenga el nombre de los parametros
     private ArrayList parametros;
 
-    public Tipo(String elem) 
+    public Atributos(String elem) 
     {
         String [] arreglo = elem.split("#");
         this.nombre = arreglo[0];
@@ -32,17 +32,20 @@ public class Tipo
             this.tipoDato = arreglo[3];
         else
         {
-            this.parametros = new ArrayList();
-            String[] par = arreglo[3].split("&");
-            for (int i = 0; i < par.length; i++) 
+            if(!tipo.equalsIgnoreCase("nombre programa"))
             {
-                this.parametros.add(par[i]);
-            }
+                this.parametros = new ArrayList();
+                String[] par = arreglo[3].split("&");
+                for (int i = 0; i < par.length; i++) 
+                {
+                    this.parametros.add(par[i]);
+                }
            
-            if(tipo.equalsIgnoreCase("funcion"))
-            {
-                this.tipoRetorno = arreglo [4];
-            }
+                if(tipo.equalsIgnoreCase("funcion"))
+                {
+                    this.tipoRetorno = arreglo [4];
+                }
+            }    
         }  
     }
     
@@ -75,5 +78,28 @@ public class Tipo
     {
         return parametros;
     }
+    public String getAtributos()
+    {
+        String cad = this.nombre+" "+this.Alcance+" "+this.tipo;
+        if(tipo.equalsIgnoreCase("variable"))
+            cad+=" "+this.tipoDato;
+        else
+        {
+            if(!tipo.equalsIgnoreCase("nombre programa"))
+            {
+                for (int i = 0; i < parametros.size(); i++) 
+                {
+                    cad+=" "+parametros.get(i);
+                }
+           
+                if(tipo.equalsIgnoreCase("funcion"))
+                {
+                    cad+=" "+ this.tipoRetorno;
+                }
+            }    
+        } 
+        return cad;
+    }
+    
 
 }

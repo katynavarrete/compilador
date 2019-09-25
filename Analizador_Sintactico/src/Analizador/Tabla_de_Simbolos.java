@@ -5,9 +5,9 @@
  */
 package Analizador;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Stack;
+
 
 /**
  *
@@ -15,43 +15,54 @@ import java.util.List;
  */
 public class Tabla_de_Simbolos 
 {
-    private HashMap<String, ArrayList> tabla;
+     private Stack <HashMap> pila;
     
     public Tabla_de_Simbolos()
     {
-        tabla = new HashMap();
-        
+       pila = new Stack();
     }
-    public void insertar(String elem)
+    public boolean insertarElem(String elem)
     {
-        boolean exito = false;
+        boolean exito = true;
         String [] arreglo = elem .split("#");
-        if(!tabla.containsKey(arreglo[0]))
+        String nombre = arreglo[0];
+        if(pila.empty())
         {
-            Tipo tipo = new Tipo(elem);
-            ArrayList nueva = new ArrayList();
-            nueva.add(tipo);
-            tabla.put(arreglo[0],nueva);
+            pila.push(new HashMap());
+        }
+        HashMap aux = pila.peek();
+        if(!aux.containsKey(nombre))
+        {
+            Atributos atributo = new Atributos(elem);
+            aux.put(nombre, atributo);
         }
         else
         {
-            ArrayList aux = tabla.get(arreglo[0]);
-            boolean existe= false;
-            int j = 0;
-            while(!existe && j < aux.size())
+            if(!((Atributos)aux.get(nombre)).getTipo().equalsIgnoreCase(arreglo[2]))
             {
-                String alc = ((Tipo)aux.get(j)).getAlcance();
-                if(arreglo[1].equalsIgnoreCase(alc))
-                {
-                    existe = true;
-                }
-                j++;
+                System.out.println("Error semantico se quiere usar un atributo como "+((Atributos)aux.get(nombre)).getTipo()+
+                        " y como "+arreglo[2]);
+                exito = false;
             }
-            if(!existe)
-            {
-                Tipo tipo = new Tipo(elem);
-                aux.add(tipo);
-            }
+            
         }
+        return exito;
     }
+    public void insertarTS()
+    {
+        pila.push(new HashMap());
+    }
+    public void eliminarTS()
+    {
+        if(!pila.empty())
+            pila.pop();
+    }
+     
+    public void imprimir()
+    {
+        HashMap map = pila.peek();
+        map.forEach((k,v)-> System.out.println(((Atributos)v).getAtributos()));
+                
+    }
+    
 }

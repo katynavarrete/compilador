@@ -8,6 +8,7 @@ package Analizador;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 
@@ -20,17 +21,20 @@ import java.util.HashMap;
 {
      public static String preanalisis;
      public static String[] linea;
+     public static Tabla_de_Simbolos ts;
      
      public  static void main(String args[]) throws IOException
     {
        
       // if(args.length == 1)
        {
-           
+           ts = new Tabla_de_Simbolos();
          //   AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
-            AnalizadorLexico lexico = new 
+            
+         AnalizadorLexico lexico = new 
                 AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\test.pas");
             inicio(lexico);
+            
             lexico.cerrarArchivo();
            
        }
@@ -49,14 +53,15 @@ import java.util.HashMap;
         if(preanalisis.equalsIgnoreCase("token_program"))
 	{
             match("token_program",lexico);
+            ts.insertarElem((linea[2]+"#global#nombre programa"));
             match("id",lexico);
             match("punto_y_coma",lexico);
             if(preanalisis.equalsIgnoreCase("token_var"))   
-		def_variable(lexico);
+		def_variable(lexico,"global");
             //sigue aca
             while ( preanalisis.equalsIgnoreCase("token_function")  ||  preanalisis.equalsIgnoreCase("token_procedure"))
             {
-                subprograma(lexico);
+                subprograma(lexico,"global");
             }
             sentencia_compuesta(lexico);
             match("punto",lexico);
@@ -69,26 +74,43 @@ import java.util.HashMap;
 	}
         
     }
-     public static  void def_variable(AnalizadorLexico lexico) throws IOException
+    
+    //una posibilidad para manejar el alcance es que se lo mande como parametro 
+     public static  void def_variable(AnalizadorLexico lexico,String alcance) throws IOException
     {
+        ArrayList aux = new ArrayList();
+        String cad = "";
         //System.out.println("DEF_VARIABLE");
         if(preanalisis.equalsIgnoreCase("token_var"))
 	{
             match("token_var",lexico);
            // System.out.println(preanalisis);
             while (preanalisis.equalsIgnoreCase("id")) 
-            { 
+            {
+                aux.add(linea[2]);
 		match("id",lexico);
 		while (preanalisis.equalsIgnoreCase("coma"))
 		{
                     match("coma",lexico);
+                    aux.add(linea[2]);
                     match("id",lexico);
 		}
 		match("dos_puntos",lexico);
+                int pos = preanalisis.lastIndexOf('_');
+                String nomTipo = preanalisis.substring(pos+1);
+                int i = 0;
+                for ( i = 0; i < aux.size(); i++) 
+                {
+                    ts.insertarElem((aux.get(i))+"#"+alcance+"#variable#"+nomTipo);
+                   // cad+= aux.get(i)+"?"+nomTipo+"&";
+                }
                
+                aux.removeAll(aux);
 		tipo(lexico); 
-		match("punto_y_coma",lexico);
+                match("punto_y_coma",lexico);
             }
+           ts.imprimir();
+            System.out.println("-----------------------------------------");
 	}
 	else
 	{
@@ -97,14 +119,17 @@ import java.util.HashMap;
            System.exit(0);
 	}
    }
-     public static   void subprograma(AnalizadorLexico lexico) throws IOException
+     public static   void subprograma(AnalizadorLexico lexico,String alcance) throws IOException
     {
         //System.out.println("SUBPROGRAMA");
+        String alcance1 ;
         switch(preanalisis) 
         {
             case "token_procedure":
                 match("token_procedure",lexico); 
+                alcance1 = linea[2];
                 match("id",lexico); 
+                
                 if(preanalisis.equalsIgnoreCase("parent_abre") )
                 {
                     match("parent_abre",lexico);
@@ -137,10 +162,10 @@ import java.util.HashMap;
                 }
                 match("punto_y_coma",lexico);
                 if( preanalisis.equalsIgnoreCase("token_var"))
-                    def_variable(lexico);
+                    def_variable(lexico,alcance1);
                 while ( preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure")) 
                 {
-                    subprograma(lexico);
+                    subprograma(lexico,alcance1);
                 }
                 if(preanalisis.equalsIgnoreCase("token_if") || preanalisis.equalsIgnoreCase("token_read") || 
                     preanalisis.equalsIgnoreCase("token_write") || preanalisis.equalsIgnoreCase("token_while")  || 
@@ -159,6 +184,7 @@ import java.util.HashMap;
 
             case  "token_function":
                 match("token_function",lexico); 
+                alcance1 = linea[2];
 		match("id",lexico); 
 		if(preanalisis.equalsIgnoreCase("parent_abre") ) 
 		{
@@ -194,10 +220,10 @@ import java.util.HashMap;
                 tipo(lexico);
 		match("punto_y_coma",lexico);
 		if( preanalisis.equalsIgnoreCase("token_var"))
-                    def_variable(lexico);
+                    def_variable(lexico,alcance1);
                 while ( preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure")) 
                 {
-                    subprograma(lexico);
+                    subprograma(lexico,alcance1);
                 }
                 if(preanalisis.equalsIgnoreCase("token_if") || preanalisis.equalsIgnoreCase("token_read") || 
 		   preanalisis.equalsIgnoreCase("token_write") || preanalisis.equalsIgnoreCase("token_while")

@@ -4,11 +4,12 @@ var
     z: Integer;
 
 function algo1(a: integer): boolean; 
+
  begin 
     b := a + 10;
     
  end;
-  function c:integer;
+function c:integer;
       var m :boolean;
       begin
         a :=7;
