@@ -3,17 +3,18 @@ var
     a, b: BOOLEAN;
     z: Integer;
 
-function algo1(a: integer): boolean; 
-
+procedure algo1(a,b,c: integer; y:boolean); 
+   var m:integer;
+    function lkdad:boolean;
+var l:integer;
+    begin
+        x:=5;
+    end;
  begin 
     b := a + 10;
     
  end;
-function c:integer;
-      var m :boolean;
-      begin
-        a :=7;
-      end;
+
 begin
 pru:= 3 <> 7;
 if 5 then 

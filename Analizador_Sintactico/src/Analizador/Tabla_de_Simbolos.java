@@ -35,15 +35,26 @@ public class Tabla_de_Simbolos
         {
             Atributos atributo = new Atributos(elem);
             aux.put(nombre, atributo);
+            this.imprimir();
         }
         else
         {
-            if(!((Atributos)aux.get(nombre)).getTipo().equalsIgnoreCase(arreglo[2]))
+            if(!((Atributos)aux.get(nombre)).getTipo().equalsIgnoreCase(arreglo[2])  )
             {
                 System.out.println("Error semantico se quiere usar un atributo como "+((Atributos)aux.get(nombre)).getTipo()+
                         " y como "+arreglo[2]);
                 exito = false;
             }
+            else
+            {
+                if(!((Atributos)aux.get(nombre)).getTipoDato().equalsIgnoreCase(arreglo[3]))
+                {
+                    System.out.println("Error semantico se quiere usar una misma variable como "+((Atributos)aux.get(nombre)).getTipoDato()+
+                            " y como "+arreglo[3]);
+                    exito = false;
+                }
+            }
+                
             
         }
         return exito;
@@ -62,6 +73,7 @@ public class Tabla_de_Simbolos
     {
         HashMap map = pila.peek();
         map.forEach((k,v)-> System.out.println(((Atributos)v).getAtributos()));
+        System.out.println("------------------------------");
                 
     }
     

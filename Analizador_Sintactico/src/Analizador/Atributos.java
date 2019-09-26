@@ -26,6 +26,7 @@ public class Atributos
     {
         String [] arreglo = elem.split("#");
         this.nombre = arreglo[0];
+        //System.out.println(elem);
         this.Alcance = arreglo[1];
         this.tipo = arreglo[2];
         if(tipo.equalsIgnoreCase("variable"))
@@ -34,16 +35,22 @@ public class Atributos
         {
             if(!tipo.equalsIgnoreCase("nombre programa"))
             {
+             
                 this.parametros = new ArrayList();
-                String[] par = arreglo[3].split("&");
-                for (int i = 0; i < par.length; i++) 
+                if((arreglo.length > 4 && tipo.equalsIgnoreCase("funcion")) || (arreglo.length > 3 && tipo.equalsIgnoreCase("procedimiento")) )
                 {
-                    this.parametros.add(par[i]);
+                    String[] par = arreglo[3].split("&");
+                    for (int i = 0; i < par.length; i++) 
+                    {
+                        this.parametros.add(par[i]);
+                    }
                 }
-           
                 if(tipo.equalsIgnoreCase("funcion"))
                 {
-                    this.tipoRetorno = arreglo [4];
+                    if(arreglo.length > 4)
+                        this.tipoRetorno = arreglo[4];
+                    else
+                        this.tipoRetorno = arreglo[3];
                 }
             }    
         }  
@@ -80,6 +87,7 @@ public class Atributos
     }
     public String getAtributos()
     {
+      
         String cad = this.nombre+" "+this.Alcance+" "+this.tipo;
         if(tipo.equalsIgnoreCase("variable"))
             cad+=" "+this.tipoDato;

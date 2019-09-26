@@ -54,6 +54,7 @@ import java.util.HashMap;
 	{
             match("token_program",lexico);
             ts.insertarElem((linea[2]+"#global#nombre programa"));
+           
             match("id",lexico);
             match("punto_y_coma",lexico);
             if(preanalisis.equalsIgnoreCase("token_var"))   
@@ -109,8 +110,8 @@ import java.util.HashMap;
 		tipo(lexico); 
                 match("punto_y_coma",lexico);
             }
-           ts.imprimir();
-            System.out.println("-----------------------------------------");
+         //  ts.imprimir();
+          //  System.out.println("-----------------------------------------");
 	}
 	else
 	{
@@ -119,53 +120,110 @@ import java.util.HashMap;
            System.exit(0);
 	}
    }
-     public static   void subprograma(AnalizadorLexico lexico,String alcance) throws IOException
+     public static  void subprograma(AnalizadorLexico lexico,String alcancePadre) throws IOException
     {
         //System.out.println("SUBPROGRAMA");
-        String alcance1 ;
+        String nombre="";
+        ArrayList parametros = new ArrayList();
+        
         switch(preanalisis) 
         {
             case "token_procedure":
                 match("token_procedure",lexico); 
-                alcance1 = linea[2];
+                nombre = linea[2];
+                
+                String alcance = "local en "+nombre;
                 match("id",lexico); 
+                
+               //aca agregar un insertar en la TS
                 
                 if(preanalisis.equalsIgnoreCase("parent_abre") )
                 {
                     match("parent_abre",lexico);
                     while (preanalisis.equalsIgnoreCase("id"))
                     { 
+                        parametros.add(linea[2]);
                         match("id",lexico);
                    
                         
                         while (preanalisis.equalsIgnoreCase("coma"))
                         {
                             match("coma",lexico);
+                            parametros.add(linea[2]);
                             match("id",lexico);
                         }
                         match("dos_puntos",lexico);
+                        int pos = preanalisis.lastIndexOf("_");
+                        String nomTipo = preanalisis.substring(pos+1);
+                        String cadena ="";
+                        int i = 0;
+                        for ( i = 0; i < parametros.size(); i++) 
+                        {
+                            cadena+= parametros.get(i)+"."+nomTipo+"&";
+                        }
+                        //cadena+= parametros.get(i)+"?"+nomTipo;
+                        parametros.removeAll(parametros);
                         tipo(lexico);
                         while(preanalisis.equalsIgnoreCase("punto_y_coma"))
                         {
                             match("punto_y_coma",lexico);
+                            parametros.add(linea[2]);
                             match("id",lexico);
                             while (preanalisis.equalsIgnoreCase("coma"))
                             {
                                 match("coma",lexico);
+                                parametros.add(linea[2]);
                                 match("id",lexico);
                             }
                             match("dos_puntos",lexico);
+                            pos = preanalisis.lastIndexOf("_");
+                            nomTipo = preanalisis.substring(pos+1);
+                            for ( i = 0; i < parametros.size()-1; i++) 
+                            {
+                                cadena+= parametros.get(i)+"."+nomTipo+"&";
+                            }
+                            cadena+= parametros.get(i)+"."+nomTipo;
+                            parametros.removeAll(parametros);
+                            
                             tipo(lexico);
+                        }
+                        if(!ts.insertarElem(nombre+"#"+alcancePadre+"#procedimiento#"+cadena))
+                            System.exit(0);
+                        
+                        ts.insertarTS();
+                        
+                        String [] parAux = cadena.split("&");
+                        for (int j = 0; j < parAux.length; j++) 
+                        {
+                           
+                            int pos1 = parAux[j].lastIndexOf(".");
+                           
+                            String nomV = parAux[j].substring(0, pos1);
+                            String tipoDato = parAux[j].substring(pos1+1);
+                          //  System.out.println("nom "+nomV+"    "+tipoDato);
+                            if(!ts.insertarElem(nomV+"#"+alcance+"#variable#"+tipoDato))
+                            {
+                                System.exit(0);
+                            }
                         }
                         match("parent_cierra",lexico);  
                     }
                 }
+                else
+                {
+                    ts.insertarElem(nombre+"#"+alcancePadre+"#procedimiento");
+                    ts.insertarTS();
+                    
+                }
                 match("punto_y_coma",lexico);
+                
+                            
+                //aca ya se tiene la info para procedure
                 if( preanalisis.equalsIgnoreCase("token_var"))
-                    def_variable(lexico,alcance1);
+                    def_variable(lexico,alcance);
                 while ( preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure")) 
                 {
-                    subprograma(lexico,alcance1);
+                    subprograma(lexico,alcance);
                 }
                 if(preanalisis.equalsIgnoreCase("token_if") || preanalisis.equalsIgnoreCase("token_read") || 
                     preanalisis.equalsIgnoreCase("token_write") || preanalisis.equalsIgnoreCase("token_while")  || 
@@ -180,50 +238,116 @@ import java.util.HashMap;
                     sentencia_compuesta(lexico); 
                     match("punto_y_coma",lexico);
                 }
+                ts.eliminarTS();
+               
             break;
 
             case  "token_function":
                 match("token_function",lexico); 
-                alcance1 = linea[2];
+                alcance = "local en "+linea[2];
+                nombre = linea[2];
 		match("id",lexico); 
+                String cadena ="";
+                boolean conParametros=false;
 		if(preanalisis.equalsIgnoreCase("parent_abre") ) 
 		{
+                    conParametros=true;
                     match("parent_abre",lexico);
                    
                     while (preanalisis.equalsIgnoreCase("id")) 
                     { 
+                        parametros.add(linea[2]);
                         match("id",lexico);
                         while (preanalisis.equalsIgnoreCase("coma"))
                         {
                             match("coma",lexico);
+                            parametros.add(linea[2]);
                             match("id",lexico);
                         }
                         match("dos_puntos",lexico);
+                        int pos = preanalisis.lastIndexOf("_");
+                        String nomTipo = preanalisis.substring(pos+1);
+
+                        int i = 0;
+                        for ( i = 0; i < parametros.size(); i++) 
+                        {
+                            cadena+= parametros.get(i)+"."+nomTipo+"&";
+                        }
+                        //cadena+= parametros.get(i)+"?"+nomTipo;
+                        parametros.removeAll(parametros);
                         tipo(lexico);
                         while(preanalisis.equalsIgnoreCase("punto_y_coma"))
                         {
                             match("punto_y_coma",lexico);
+                            parametros.add(linea[2]);
                             match("id",lexico);
                             while (preanalisis.equalsIgnoreCase("coma"))
                             {
                                 match("coma",lexico);
+                                parametros.add(linea[2]);
                                 match("id",lexico);
                             }
                             match("dos_puntos",lexico);
+                            pos = preanalisis.lastIndexOf("_");
+                            nomTipo = preanalisis.substring(pos+1);
+                            i = 0;
+                            for ( i = 0; i < parametros.size(); i++) 
+                            {
+                                cadena+= parametros.get(i)+"."+nomTipo+"&";
+                            }
+                        //cadena+= parametros.get(i)+"?"+nomTipo;
+                            parametros.removeAll(parametros);
+                            
                             tipo(lexico);
                         }
                      match("parent_cierra",lexico);      
                     } 					          
                     
 		}
+                
                 match("dos_puntos",lexico);
+                int pos = preanalisis.lastIndexOf("_");
+                String nomTipo = preanalisis.substring(pos+1);
+                
+                if(conParametros && !ts.insertarElem(nombre+"#"+alcancePadre+"#funcion#"+cadena+"#"+nomTipo))
+                {
+                    System.exit(0);
+                }
+                else
+                {
+                    if(!ts.insertarElem(nombre+"#"+alcancePadre+"#funcion#"+nomTipo))
+                    {
+                        System.exit(0);
+                    }
+                }
+                    
+                ts.insertarTS();
+                
+                String [] parAux = cadena.split("&");
+                if(!parAux[0].equalsIgnoreCase(""))
+                {
+                    for (int j = 0; j < parAux.length; j++) 
+                    {
+                 
+                        int pos1 = parAux[j].lastIndexOf(".");
+                        
+                        String nomV = parAux[j].substring(0, pos1);
+                        String tipoDato = parAux[j].substring(pos1+1);
+                    //  System.out.println("nom "+nomV+"    "+tipoDato);
+                        if(!ts.insertarElem(nomV+"#"+alcance+"#variable#"+tipoDato))
+                        {
+                            System.exit(0);
+                        }
+                    }
+                }    
+               // ts.imprimir();
                 tipo(lexico);
 		match("punto_y_coma",lexico);
 		if( preanalisis.equalsIgnoreCase("token_var"))
-                    def_variable(lexico,alcance1);
+                    def_variable(lexico,alcance);
                 while ( preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure")) 
                 {
-                    subprograma(lexico,alcance1);
+                    subprograma(lexico,alcance);
                 }
                 if(preanalisis.equalsIgnoreCase("token_if") || preanalisis.equalsIgnoreCase("token_read") || 
 		   preanalisis.equalsIgnoreCase("token_write") || preanalisis.equalsIgnoreCase("token_while")
@@ -236,8 +360,13 @@ import java.util.HashMap;
 		else
 		{ 
                     sentencia_compuesta(lexico); 
+                    
                     match("punto_y_coma",lexico);
+                   
 		}
+                    
+                    ts.eliminarTS();
+                    
 		break;
                 default: 
                 {
