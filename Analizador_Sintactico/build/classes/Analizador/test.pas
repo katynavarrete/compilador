@@ -2,23 +2,29 @@ program  algo ;
 var
     a, b: BOOLEAN;
     z: Integer;
-
-procedure algo1(a,b,c: integer; y:boolean); 
+ function los(a:integer):boolean;
+begin
+    read(p);
+end;
+procedure algo1(b,c: integer; y:boolean); 
    var m:integer;
     function lkdad:boolean;
-var l:integer;
-    begin
-        x:=5;
-    end;
- begin 
-    b := a + 10;
+        var l:integer;
+        begin
+            b:=5;
+            a:= 4;
+        end;
+    begin 
+        b :=  10;
     
- end;
+    end;
 
 begin
-pru:= 3 <> 7;
+
+algo1(a,b);
 if 5 then 
 read(a)
+
 else
  a := 5>4;
 b:= a>4;

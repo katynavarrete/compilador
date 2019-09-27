@@ -21,6 +21,21 @@ public class Tabla_de_Simbolos
     {
        pila = new Stack();
     }
+    public boolean verificarElem(String elem)
+    {
+        boolean existe = false;
+        int i = pila.size()-1;
+        while(i >= 0 && !existe)
+        {
+            if(pila.get(i).containsKey(elem))
+            {
+                existe = true;
+                
+            }
+            i--;
+        }
+        return existe;
+    }
     public boolean insertarElem(String elem)
     {
         boolean exito = true;
@@ -39,6 +54,10 @@ public class Tabla_de_Simbolos
         }
         else
         {
+            /*
+                cambiar de lugar los imprimir de los errores para que puedan mostrar
+                la linea
+            */
             if(!((Atributos)aux.get(nombre)).getTipo().equalsIgnoreCase(arreglo[2])  )
             {
                 System.out.println("Error semantico se quiere usar un atributo como "+((Atributos)aux.get(nombre)).getTipo()+
@@ -47,9 +66,10 @@ public class Tabla_de_Simbolos
             }
             else
             {
-                if(!((Atributos)aux.get(nombre)).getTipoDato().equalsIgnoreCase(arreglo[3]))
+                if(((Atributos)aux.get(nombre)).getTipo().equalsIgnoreCase("variable")
+                        &&!((Atributos)aux.get(nombre)).getTipoDato().equalsIgnoreCase(arreglo[3]))
                 {
-                    System.out.println("Error semantico se quiere usar una misma variable como "+((Atributos)aux.get(nombre)).getTipoDato()+
+                   System.out.println("Error semantico se quiere usar una misma variable como "+((Atributos)aux.get(nombre)).getTipoDato()+
                             " y como "+arreglo[3]);
                     exito = false;
                 }

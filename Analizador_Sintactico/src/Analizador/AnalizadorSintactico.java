@@ -458,8 +458,16 @@ import java.util.HashMap;
 		sent_repetitiva(lexico);
             break;
             case "id":
-		match("id",lexico);
-		sentencia_simple1(lexico);
+                if(ts.verificarElem(linea[2]))
+                {
+                    match("id",lexico);
+                    sentencia_simple1(lexico);
+                }
+                else
+                {
+                    System.out.println("ERROR SEMANTICO se esta usando la variable "+ linea[2]+" no definida en la linea "+linea[1]);
+                    System.exit(0);
+                }
             break;
             default: 
             //    System.out.println("ERROR EN EL SENTENCIA_SIMPLE");
@@ -722,11 +730,19 @@ import java.util.HashMap;
 	else
 	{
 	       if(preanalisis.equalsIgnoreCase("token_read"))
-	      {
-		match("token_read",lexico);  
-		match("parent_abre",lexico); 
-		match("id",lexico);
-		match("parent_cierra",lexico);
+               {
+                    match("token_read",lexico);  
+                    match("parent_abre",lexico); 
+                    if(ts.verificarElem(linea[2]))
+                    {
+                        match("id",lexico);
+                        match("parent_cierra",lexico);
+                    }
+                    else
+                    {
+                        System.out.println("ERROR SEMANTICO "+linea[2]+" EN LA LINEA "+linea[1]);
+                        System.exit(0);
+                    }
 	       }
                else
                {
@@ -969,8 +985,16 @@ import java.util.HashMap;
             factor1(lexico);
 	break;
 	case "id":
-            match("id",lexico);
-            factor2(lexico);
+            if(ts.verificarElem(linea[2]))
+            {
+                match("id",lexico);
+                factor2(lexico);
+            }
+            else
+            {
+                System.out.println("ERROR SEMANTICO "+linea[2]+" en la linea "+linea[1]);
+                System.exit(0);
+            }
 	break;
 	case  "token_num":
             match("token_num",lexico);
@@ -999,7 +1023,15 @@ import java.util.HashMap;
             match("token_num",lexico);
 	break;
 	case "id":
-            match("id",lexico);
+            if(ts.verificarElem(linea[2]))
+            {
+                match("id",lexico);
+            }    
+            else
+            {
+                System.out.println("ERROR SEMANTICO "+linea[2]+" en la linea "+linea[1]);
+                System.exit(0);
+            }
 	break;
 	case "parent_abre" :
             match("parent_abre",lexico);
