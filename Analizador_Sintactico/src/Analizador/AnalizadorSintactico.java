@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Stack;
 
 
 /**
@@ -22,20 +23,26 @@ import java.util.HashMap;
      public static String preanalisis;
      public static String[] linea;
      public static Tabla_de_Simbolos ts;
+     public static Stack <Atributos> atributo;
+     public static Stack  posParametro;
      
      public  static void main(String args[]) throws IOException
     {
        
       // if(args.length == 1)
        {
+            atributo = new Stack();
+            posParametro = new Stack();
            ts = new Tabla_de_Simbolos();
          //   AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             
          AnalizadorLexico lexico = new 
-                AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\Analizador_Sintactico\\src\\Analizador\\test.pas");
+                AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\"
+                        + "Analizador_Sintactico\\src\\Analizador\\test.pas");
             inicio(lexico);
             
             lexico.cerrarArchivo();
+            
            
        }
 //       else
@@ -159,7 +166,7 @@ import java.util.HashMap;
                         int i = 0;
                         for ( i = 0; i < parametros.size(); i++) 
                         {
-                            cadena+= parametros.get(i)+"."+nomTipo+"&";
+                            cadena+= parametros.get(i)+"@"+nomTipo+"&";
                         }
                         //cadena+= parametros.get(i)+"?"+nomTipo;
                         parametros.removeAll(parametros);
@@ -180,9 +187,9 @@ import java.util.HashMap;
                             nomTipo = preanalisis.substring(pos+1);
                             for ( i = 0; i < parametros.size()-1; i++) 
                             {
-                                cadena+= parametros.get(i)+"."+nomTipo+"&";
+                                cadena+= parametros.get(i)+"@"+nomTipo+"&";
                             }
-                            cadena+= parametros.get(i)+"."+nomTipo;
+                            cadena+= parametros.get(i)+"@"+nomTipo;
                             parametros.removeAll(parametros);
                             
                             tipo(lexico);
@@ -196,7 +203,8 @@ import java.util.HashMap;
                         for (int j = 0; j < parAux.length; j++) 
                         {
                            
-                            int pos1 = parAux[j].lastIndexOf(".");
+                          //  System.out.println(parAux[j]);
+                            int pos1 = parAux[j].lastIndexOf("@");
                            
                             String nomV = parAux[j].substring(0, pos1);
                             String tipoDato = parAux[j].substring(pos1+1);
@@ -271,7 +279,7 @@ import java.util.HashMap;
                         int i = 0;
                         for ( i = 0; i < parametros.size(); i++) 
                         {
-                            cadena+= parametros.get(i)+"."+nomTipo+"&";
+                            cadena+= parametros.get(i)+"@"+nomTipo+"&";
                         }
                         //cadena+= parametros.get(i)+"?"+nomTipo;
                         parametros.removeAll(parametros);
@@ -293,7 +301,7 @@ import java.util.HashMap;
                             i = 0;
                             for ( i = 0; i < parametros.size(); i++) 
                             {
-                                cadena+= parametros.get(i)+"."+nomTipo+"&";
+                                cadena+= parametros.get(i)+"@"+nomTipo+"&";
                             }
                         //cadena+= parametros.get(i)+"?"+nomTipo;
                             parametros.removeAll(parametros);
@@ -329,7 +337,7 @@ import java.util.HashMap;
                     for (int j = 0; j < parAux.length; j++) 
                     {
                  
-                        int pos1 = parAux[j].lastIndexOf(".");
+                        int pos1 = parAux[j].lastIndexOf("@");
                         
                         String nomV = parAux[j].substring(0, pos1);
                         String tipoDato = parAux[j].substring(pos1+1);
@@ -458,8 +466,12 @@ import java.util.HashMap;
 		sent_repetitiva(lexico);
             break;
             case "id":
-                if(ts.verificarElem(linea[2]))
-                {
+                Atributos aux = ts.verificarElem(linea[2]);
+                if(aux != null)
+                {   
+                    //System.out.println(atributo.toString());
+                    atributo.push(aux);
+                    
                     match("id",lexico);
                     sentencia_simple1(lexico);
                 }
@@ -479,6 +491,10 @@ import java.util.HashMap;
     }
 
 
+     //este es para id () llama a funion o a procediemto
+     //conciderar que hay funciones o procedimientos que no tienen parametros
+     //o id:= asignacion
+     
      public static   void sentencia_simple1(AnalizadorLexico lexico) throws IOException 
     {
         //System.out.println("SENTENCIA_SIMPLE1");
@@ -486,19 +502,57 @@ import java.util.HashMap;
         {
             case "parent_abre":
                 match("parent_abre",lexico); 
+                Atributos at = atributo.peek();
+                if(at != null &&(at.getTipo().equalsIgnoreCase("funcion") ||
+                   at.getTipo().equalsIgnoreCase("procedimiento")))
+                    posParametro.push(0);
+             //   System.out.println("atributos "+atributo.getAtributos()+" cantP "+atributo.getCantParametros());
 		expresion(lexico);
 		while (preanalisis.equalsIgnoreCase("coma"))
-		{ 
-                    match("coma",lexico);
-                    expresion(lexico);
+		{   
+                    if((int)posParametro.peek() < at.getCantParametros())
+                    {
+                        match("coma",lexico);
+                        expresion(lexico);
+                    }
+                    else
+                    {
+                        System.out.println("ERROR SEMANTICO para  "+
+                                at.getNombre()+ " se requieren "+at.getCantParametros()+" parametros");
+                        System.exit(0);
+                    }
 		}
-		match("parent_cierra",lexico);
+                if((int)posParametro.peek() == (at.getCantParametros()))
+                {
+                    match("parent_cierra",lexico);
+                    posParametro.pop();
+                    atributo.pop();
+                }
+                else
+                {
+                    System.out.println("ERROR SEMANTICO se utilizaron "+ (posParametro )+
+                            " parametros  y se requerian "+at.getCantParametros()+" en la linea "+linea[1]);
+                    System.exit(0);
+                }
             break;
             case "asignacion":
 		match("asignacion",lexico); 
 		expresion(lexico);
             break;
+            default:
+                at = atributo.peek();
+                if((at.getTipo().equalsIgnoreCase("funcion")||at.getTipo().equalsIgnoreCase("procedimiento"))&&
+                        at.getCantParametros()!= 0)
+                
+                {
+                     System.out.println("ERROR SEMANTICO para  "+
+                                at.getNombre()+ " se requieren "+at.getCantParametros()+
+                             " parametros y no se recibe ninguno ");
+                        System.exit(0);
+                }    
+            break;
 	}
+       
     }
 
 
@@ -733,7 +787,7 @@ import java.util.HashMap;
                {
                     match("token_read",lexico);  
                     match("parent_abre",lexico); 
-                    if(ts.verificarElem(linea[2]))
+                    if((ts.verificarElem(linea[2]))!=null)
                     {
                         match("id",lexico);
                         match("parent_cierra",lexico);
@@ -779,9 +833,10 @@ import java.util.HashMap;
     // System.out.println("EXPRESION1");
 	if (preanalisis.equalsIgnoreCase("token_or") ) 
 	{
+            
 		match("token_or",lexico); 
-		exp1(lexico); 
-		expresion(lexico);
+                exp1(lexico); 
+		expresion1(lexico);
 	}
 }
 
@@ -985,9 +1040,42 @@ import java.util.HashMap;
             factor1(lexico);
 	break;
 	case "id":
-            if(ts.verificarElem(linea[2]))
-            {
+            
+            //verificar lo de las funciones////
+            Atributos aux = (ts.verificarElem(linea[2]));
+            if(aux != null)
+            {   
+               Atributos at = atributo.peek();
+                
+                if(at!= null && (at.getTipo().equalsIgnoreCase("funcion"))||
+                        (at.getTipo().equalsIgnoreCase("procedimiento")))
+                {
+                   
+                    String [] param =((String) at.getParametros().get((int)posParametro.peek())).split("@");
+            //        System.out.println(param.length+" "+((String) atributo.getParametros().get(posParametro)));
+                    
+                    if(!aux.getTipo().equalsIgnoreCase("variable"))
+                    {
+                        System.out.println("ERROR SEMANTICO SE QUIERE USAR "+ aux.getTipo()+" en lugar de una variable en la linea  "+linea[1]);
+                        System.exit(0);
+                    }
+                    else
+                    {
+                        if( !aux.getTipoDato().equalsIgnoreCase(param[1]))
+                        {
+                            System.out.println("ERROR SEMANTICO SE PASA POR PARAMETRO UN "+aux.getTipoDato()+
+                                    " Y SE NECESITA UN "+param[1]+" en la linea "+linea[1]);
+                            System.exit(0);
+                        }
+                    }
+                    
+                    
+                    
+                }
                 match("id",lexico);
+                int pos = (int)posParametro.peek();
+                posParametro.push(pos+1);
+                
                 factor2(lexico);
             }
             else
@@ -1023,7 +1111,7 @@ import java.util.HashMap;
             match("token_num",lexico);
 	break;
 	case "id":
-            if(ts.verificarElem(linea[2]))
+            if((ts.verificarElem(linea[2]))!= null)
             {
                 match("id",lexico);
             }    

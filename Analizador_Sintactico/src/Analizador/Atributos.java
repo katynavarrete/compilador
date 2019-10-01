@@ -108,6 +108,13 @@ public class Atributos
         } 
         return cad;
     }
+    public int getCantParametros()
+    {
+        int cant = -1;
+        if(this.parametros != null)
+            cant = this.parametros.size();
+        return cant;
+    }
     
 
 }

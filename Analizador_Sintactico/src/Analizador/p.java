@@ -16,14 +16,20 @@ public class p
 {
     public static void main(String[] args) 
     {
+        
+       
+        
        Stack pila = new Stack();
        pila.push(5);
        pila.push(7);
        pila.push(9);
+        System.out.println(pila.toString());
+        pila.pop();
+        System.out.println(pila.toString());
        
-        System.out.println(pila.get(0));
+       /* System.out.println(pila.get(0));
          System.out.println(pila.get(1));
           System.out.println(pila.get(2));
-          System.out.println(pila.size());
+         System.out.println(pila.size());*/
     }
 }

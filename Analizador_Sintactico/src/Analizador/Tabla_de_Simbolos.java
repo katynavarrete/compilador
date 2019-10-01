@@ -21,20 +21,21 @@ public class Tabla_de_Simbolos
     {
        pila = new Stack();
     }
-    public boolean verificarElem(String elem)
+    public Atributos verificarElem(String elem)
     {
-        boolean existe = false;
+        Atributos atributo = null;
+        HashMap aux;
         int i = pila.size()-1;
-        while(i >= 0 && !existe)
+        while(i >= 0 && atributo == null )
         {
-            if(pila.get(i).containsKey(elem))
+          aux= pila.get(i);
+            if(aux.containsKey(elem))
             {
-                existe = true;
-                
+                atributo = (Atributos)aux.get(elem);
             }
             i--;
         }
-        return existe;
+        return atributo;
     }
     public boolean insertarElem(String elem)
     {

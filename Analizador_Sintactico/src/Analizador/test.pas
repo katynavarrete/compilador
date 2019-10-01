@@ -1,10 +1,14 @@
 program  algo ;
 var
-    a, b: BOOLEAN;
-    z: Integer;
+    y,a, b: BOOLEAN;
+    z,j: Integer;
  function los(a:integer):boolean;
 begin
-    read(p);
+    read(a);
+end;
+ function cal(a:integer):boolean;
+begin
+    read(a);
 end;
 procedure algo1(b,c: integer; y:boolean); 
    var m:integer;
@@ -20,13 +24,14 @@ procedure algo1(b,c: integer; y:boolean);
     end;
 
 begin
-
-algo1(a,b);
-if 5 then 
+los(5);
+algo1(z,j,a);
+if (5 or 6 or 7 or 10) then 
 read(a)
 
 else
- a := 5>4;
+ 
+a:=(b-a);
 b:= a>4;
 algo;
 
