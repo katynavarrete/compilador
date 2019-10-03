@@ -23,16 +23,15 @@ import java.util.Stack;
      public static String preanalisis;
      public static String[] linea;
      public static Tabla_de_Simbolos ts;
-     public static Stack <Atributos> atributo;
-     public static Stack  posParametro;
+     public static Atributos atributo;
+     public static int  posParametro = -1;
      
      public  static void main(String args[]) throws IOException
     {
        
       // if(args.length == 1)
        {
-            atributo = new Stack();
-            posParametro = new Stack();
+           
            ts = new Tabla_de_Simbolos();
          //   AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             
@@ -399,7 +398,7 @@ import java.util.Stack;
             if(terminal.equalsIgnoreCase("punto"))
             {
                 if(preanalisis.equalsIgnoreCase(""))
-                    System.out.println("NO SE DECTARON ERRORES SINTACTICO ");
+                    System.out.println("NO SE DECTARON ERRORES :)");
                 else
                     System.out.println("ERROR SINTACTICO EN LA LINEA "+linea[1]
                             +" se encontraron lineas de codigo luego de un punto");
@@ -470,8 +469,8 @@ import java.util.Stack;
                 if(aux != null)
                 {   
                     //System.out.println(atributo.toString());
-                    atributo.push(aux);
-                    
+                    atributo = aux;
+                    posParametro = 0;
                     match("id",lexico);
                     sentencia_simple1(lexico);
                 }
@@ -502,15 +501,15 @@ import java.util.Stack;
         {
             case "parent_abre":
                 match("parent_abre",lexico); 
-                Atributos at = atributo.peek();
-                if(at != null &&(at.getTipo().equalsIgnoreCase("funcion") ||
-                   at.getTipo().equalsIgnoreCase("procedimiento")))
-                    posParametro.push(0);
+                //Atributos at = atributo.peek();
+                if(atributo != null &&(atributo.getTipo().equalsIgnoreCase("funcion") ||
+                   atributo.getTipo().equalsIgnoreCase("procedimiento")))
+                    posParametro = 0;
              //   System.out.println("atributos "+atributo.getAtributos()+" cantP "+atributo.getCantParametros());
 		expresion(lexico);
 		while (preanalisis.equalsIgnoreCase("coma"))
 		{   
-                    if((int)posParametro.peek() < at.getCantParametros())
+                    if(posParametro < atributo.getCantParametros())
                     {
                         match("coma",lexico);
                         expresion(lexico);
@@ -518,35 +517,44 @@ import java.util.Stack;
                     else
                     {
                         System.out.println("ERROR SEMANTICO para  "+
-                                at.getNombre()+ " se requieren "+at.getCantParametros()+" parametros");
+                                atributo.getNombre()+ " se requieren "+atributo.getCantParametros()+
+                                " parametros en la linea "+linea[1] );
                         System.exit(0);
                     }
 		}
-                if((int)posParametro.peek() == (at.getCantParametros()))
+                if(posParametro == (atributo.getCantParametros()))
                 {
                     match("parent_cierra",lexico);
-                    posParametro.pop();
-                    atributo.pop();
+                    posParametro=-1;
+                    atributo = null;
                 }
                 else
                 {
                     System.out.println("ERROR SEMANTICO se utilizaron "+ (posParametro )+
-                            " parametros  y se requerian "+at.getCantParametros()+" en la linea "+linea[1]);
+                            " parametros  y se requerian "+atributo.getCantParametros()+" en la linea "+linea[1]);
                     System.exit(0);
                 }
             break;
             case "asignacion":
+                if(atributo != null && (atributo.getTipo().equalsIgnoreCase("funcion") ||
+                        atributo.getTipo().equalsIgnoreCase("procedimiento") ))
+                {
+                    System.out.println("ERROR SEMANTICO en la linea "+linea[1]+" se le esta haciendo una asignacion a " +
+                            atributo.getTipo());
+                    System.exit(0);
+                }
 		match("asignacion",lexico); 
 		expresion(lexico);
             break;
             default:
-                at = atributo.peek();
-                if((at.getTipo().equalsIgnoreCase("funcion")||at.getTipo().equalsIgnoreCase("procedimiento"))&&
-                        at.getCantParametros()!= 0)
+                
+                if((atributo.getTipo().equalsIgnoreCase("funcion")||atributo.getTipo().equalsIgnoreCase("procedimiento"))
+                        &&
+                        atributo.getCantParametros()!= 0)
                 
                 {
                      System.out.println("ERROR SEMANTICO para  "+
-                                at.getNombre()+ " se requieren "+at.getCantParametros()+
+                                atributo.getNombre()+ " se requieren "+atributo.getCantParametros()+
                              " parametros y no se recibe ninguno ");
                         System.exit(0);
                 }    
@@ -874,7 +882,8 @@ import java.util.Stack;
 
 
  public static   void exp2(AnalizadorLexico lexico) throws IOException  {
-//System.out.println("EXP2");
+
+        // Revisar si el not me puede generar un error semantico
 	if (preanalisis.equalsIgnoreCase("token_not"))  
 	{
 		match("token_not",lexico);
@@ -1026,15 +1035,44 @@ import java.util.Stack;
 
  public static   void factor(AnalizadorLexico lexico) throws IOException  
 {
-   // System.out.println("FACTOR " + preanalisis);
+    boolean fop= false;
+    String [] param = null;
+    if(atributo != null &&(atributo.getTipo().equalsIgnoreCase("funcion") || 
+            atributo.getTipo().equalsIgnoreCase("procedimiento")))
+    {
+        fop = true;
+        param =((String) atributo.getParametros().get(posParametro)).split("@");
+                
+    }
     switch(preanalisis) 
     {
 	case  "token_true":
+            if(fop)
+            {
+                 if(!param[1].equalsIgnoreCase("boolean"))
+                 {
+                     System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" se espera un "+param[1]
+                             + " y se recibe un boolean");
+                     System.exit(0);
+                 }
+                 posParametro++;
+            }
             match("token_true",lexico);
 	break;
 	case  "token_false":
+            if(fop)
+            {
+                 if(!param[1].equalsIgnoreCase("boolean"))
+                 {
+                     System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" se espera un "+param[1]
+                             + " y se recibe un boolean");
+                     System.exit(0);
+                 }
+                 posParametro++;
+            }
             match("token_false",lexico);
 	break;
+        //verificar si es puede ser un error semantico si lo que viene es un niumero
 	case  "token_resta":
             match("token_resta",lexico); 
             factor1(lexico);
@@ -1045,13 +1083,12 @@ import java.util.Stack;
             Atributos aux = (ts.verificarElem(linea[2]));
             if(aux != null)
             {   
-               Atributos at = atributo.peek();
+           //    Atributos at = atributo.peek();
                 
-                if(at!= null && (at.getTipo().equalsIgnoreCase("funcion"))||
-                        (at.getTipo().equalsIgnoreCase("procedimiento")))
+                if(fop)
                 {
                    
-                    String [] param =((String) at.getParametros().get((int)posParametro.peek())).split("@");
+                  //  String [] param =((String) atributo.getParametros().get(posParametro)).split("@");
             //        System.out.println(param.length+" "+((String) atributo.getParametros().get(posParametro)));
                     
                     if(!aux.getTipo().equalsIgnoreCase("variable"))
@@ -1073,8 +1110,8 @@ import java.util.Stack;
                     
                 }
                 match("id",lexico);
-                int pos = (int)posParametro.peek();
-                posParametro.push(pos+1);
+                
+                posParametro++;
                 
                 factor2(lexico);
             }
@@ -1085,6 +1122,16 @@ import java.util.Stack;
             }
 	break;
 	case  "token_num":
+            if(fop)
+            {
+                 if(!param[1].equalsIgnoreCase("integer"))
+                 {
+                     System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" se espera un "+param[1]
+                             + " y se recibe un integer");
+                     System.exit(0);
+                 }
+                 posParametro++;
+            }
             match("token_num",lexico);
 	break;
 	case "parent_abre" :
@@ -1104,14 +1151,33 @@ import java.util.Stack;
 
  public static   void factor1(AnalizadorLexico lexico) throws IOException  
 {
-    //System.out.println("FACTOR1");
+    boolean fop= false;
+    String [] param = null;
+    if(atributo != null &&(atributo.getTipo().equalsIgnoreCase("funcion") || 
+            atributo.getTipo().equalsIgnoreCase("procedimiento")))
+    {
+        fop = true;
+        param =((String) atributo.getParametros().get(posParametro)).split("@");
+                
+    }
     switch(preanalisis) 
     {
 	case  "token_num":
+            if(fop)
+            {
+                 if(!param[1].equalsIgnoreCase("integer"))
+                 {
+                     System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" se espera un "+param[1]
+                             + " y se recibe un integer");
+                     System.exit(0);
+                 }
+                 posParametro++;
+            }
             match("token_num",lexico);
 	break;
 	case "id":
-            if((ts.verificarElem(linea[2]))!= null)
+            Atributos aux =ts.verificarElem(linea[2]);
+            if(aux!= null && aux.getTipoDato().equalsIgnoreCase("integer"))
             {
                 match("id",lexico);
             }    
