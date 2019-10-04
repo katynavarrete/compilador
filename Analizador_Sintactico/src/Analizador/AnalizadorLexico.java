@@ -338,8 +338,10 @@ public class AnalizadorLexico
             else
             {
                 
+               
                 if(letra1 == 195)
                 {
+                    
                     System.out.println("error lexico : linea "+linea+" ñ ");
                     token="error#"+linea;
                    // System.out.println("error ñ"+token);
@@ -348,7 +350,12 @@ public class AnalizadorLexico
                 }
                 else
                 {
-                    System.out.println("error lexico : linea "+linea+" letra 56454 "+letra1);
+                    if(letra1 == 194)
+                    {
+                        System.out.println("error lexico : linea "+linea+" "+(char)fr.read());
+                    }
+                    else
+                        System.out.println("error lexico : linea "+linea+" "+(char)letra1);
                     token="error#"+linea;
                     this.cerrarArchivo();
                 }    
@@ -406,8 +413,9 @@ public class AnalizadorLexico
         int l = (int)caracter;
         if((    (l >= 65 && l <= 90) ||(l >= 97 && l <= 122)
                 || Character.isDigit(caracter) || caracter == ';' || caracter == ','
-                || caracter == '.' || caracter == '_' || caracter == '{' || caracter == '}' || caracter == '[' || caracter == ']'
-                || caracter == '*' || caracter == '/' || caracter == '+' || caracter == '-' || caracter == ':'
+                || caracter == '.' || caracter == '_' || caracter == '{' || caracter == '}' ||
+                
+                caracter == '*' || caracter == '/' || caracter == '+' || caracter == '-' || caracter == ':'
                 || caracter == '<' || caracter == '>' || caracter == '=' || caracter == '(' || caracter == ')') && (int)caracter != 195 &&
                 (int)caracter != 177)
         {

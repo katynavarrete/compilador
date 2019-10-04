@@ -5,6 +5,10 @@
  */
 package Analizador;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -14,22 +18,23 @@ import java.util.Stack;
  */
 public class p
 {
-    public static void main(String[] args) 
+    public static void main(String[] args) throws FileNotFoundException, IOException 
     {
         
-       
+       /* char c ='ñ';
+        System.out.println(Character.BYTES);*/
+        File archivo = new File("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador"
+                + "\\Analizador_Sintactico\\src\\Analizador\\probando");
+        RandomAccessFile fr = new  RandomAccessFile(archivo,"r");
         
-       Stack pila = new Stack();
-       pila.push(5);
-       pila.push(7);
-       pila.push(9);
-        System.out.println(pila.toString());
-        pila.pop();
-        System.out.println(pila.toString());
-       
-       /* System.out.println(pila.get(0));
-         System.out.println(pila.get(1));
-          System.out.println(pila.get(2));
-         System.out.println(pila.size());*/
+        for (int i = 0; i < fr.length(); i++) 
+        {
+            int aux = fr.read();
+            System.out.println((char)aux+" "+aux);
+        }
+        if(fr != null)
+            fr.close();
+                
+      
     }
 }
