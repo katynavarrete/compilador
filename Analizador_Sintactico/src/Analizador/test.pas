@@ -27,14 +27,14 @@ procedure algo1(b,c: integer; y:boolean);
 begin  
 if(los(5))then
 read(a);
-algo1(z,j,5<3);
+algo1(z,j,(5<>6));
 algo1(z,j,a);
 if (5 or 6 or 7 or 10) then 
 read(a)
 
 else
  
-a:=(b-a);
+a:=(b+cal(z)*z);
 b:= a>4;
 algo;
 
