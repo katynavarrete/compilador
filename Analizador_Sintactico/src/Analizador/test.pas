@@ -6,14 +6,14 @@ var
 begin
     read(a);
 end;
- function cal(a:integer):boolean;
+ function cal(a:integer):integer;
 begin
     read(a);
 end;
 procedure algo1(b,c: integer; y:boolean); 
    var m:integer;
     function lkdad:boolean;
-        var l:integer;  á
+        var l:integer;  
         begin
             b:=5;
             a:= 4;
@@ -27,6 +27,7 @@ procedure algo1(b,c: integer; y:boolean);
 begin  
 if(los(5))then
 read(a);
+algo1(z,j,5<3);
 algo1(z,j,a);
 if (5 or 6 or 7 or 10) then 
 read(a)

@@ -51,7 +51,7 @@ public class Tabla_de_Simbolos
         {
             Atributos atributo = new Atributos(elem);
             aux.put(nombre, atributo);
-            this.imprimir();
+          //  this.imprimir();
         }
         else
         {
