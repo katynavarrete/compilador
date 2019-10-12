@@ -50,7 +50,7 @@ import java.util.Stack;
 //           System.out.println("Falta el parametro del archivo");
 //       }
     }
-    public static void inicio(AnalizadorLexico lexico) throws IOException
+   F public static void inicio(AnalizadorLexico lexico) throws IOException
     {
         
         //System.out.println("INICIO");
@@ -502,42 +502,47 @@ import java.util.Stack;
         {
             case "parent_abre":
                 match("parent_abre",lexico); 
-                //Atributos at = atributo.peek();
                 if(atributo != null &&(atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
                    atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
-                   // posParametro.push(Integer.SIZE) 0;
-             //   System.out.println("atributos "+atributo.getAtributos()+" cantP "+atributo.getCantParametros());
-		expresion(lexico);
-                int posAux;
-		while (preanalisis.equalsIgnoreCase("coma"))
-		{   
-                    if(posParametro.peek() < (atributo.peek()).getCantParametros())
+                {    
+                    System.out.println("---------------------------------------");
+                    expresion(lexico);
+                    int posAux;
+                    while (preanalisis.equalsIgnoreCase("coma"))
+                    {   
+                        if(posParametro.peek() < (atributo.peek()).getCantParametros())
+                        {
+                            match("coma",lexico);
+                            expresion(lexico);
+                            posAux = posParametro.peek();
+                            posParametro.pop();
+                            posParametro.push(posAux+1);
+                        }
+                        else
+                        {
+                            System.out.println("ERROR SEMANTICO para  "+
+                                atributo.peek().getNombre()+ " se requieren "+atributo.peek().getCantParametros()+
+                                " parametros en la linea "+linea[1] );
+                            System.exit(0);
+                        }
+                    }
+                    if(posParametro.peek() == (atributo.peek().getCantParametros())-1)
                     {
-                        match("coma",lexico);
-                        expresion(lexico);
-                        posAux = posParametro.peek();
+                        match("parent_cierra",lexico);
                         posParametro.pop();
-                        posParametro.push(posAux+1);
+                        atributo.pop();
                     }
                     else
                     {
-                        System.out.println("ERROR SEMANTICO para  "+
-                                atributo.peek().getNombre()+ " se requieren "+atributo.peek().getCantParametros()+
-                                " parametros en la linea "+linea[1] );
+                        System.out.println("ERROR SEMANTICO se utilizaron "+ (posParametro.peek() )+
+                            " parametros  y se requerian "+atributo.peek().getCantParametros()+" en la linea "+linea[1]);
                         System.exit(0);
                     }
-		}
-                if(posParametro.peek() == (atributo.peek().getCantParametros())-1)
-                {
-                    match("parent_cierra",lexico);
-                    posParametro.pop();
-                    atributo.pop();
                 }
                 else
                 {
-                    System.out.println("ERROR SEMANTICO se utilizaron "+ (posParametro.peek() )+
-                            " parametros  y se requerian "+atributo.peek().getCantParametros()+" en la linea "+linea[1]);
-                    System.exit(0);
+                    System.out.println("ERROR SEMANTICO SE QUIERE USAR UNA VARIABLE COMO FUNCION O PROCEDIMIENTO EN LA LINEA "+linea[1]);
+                        System.exit(0);
                 }
             break;
             case "asignacion":
@@ -549,7 +554,16 @@ import java.util.Stack;
                     System.exit(0);
                 }
 		match("asignacion",lexico); 
-		expresion(lexico);
+		String tipoExp = expresion(lexico);
+                if(atributo.peek().getTipo().equalsIgnoreCase("variable")&&
+                  !tipoExp.equalsIgnoreCase(atributo.peek().getTipoDato()))
+                {
+                    System.out.println("ERROR SEMANTICO en la linea "+linea[1]+" SE QUIERE ASIGNAR A UNA VARIABLE DE TIPO "
+                    +atributo.peek().getTipoDato()+" UNA EXPRESION DE TIPO "+tipoExp);
+                    System.exit(0);
+                }
+                atributo.pop();
+                posParametro.pop();
             break;
             default:
                 
@@ -624,13 +638,21 @@ import java.util.Stack;
         }    
 }
 
-     public static   void sent_condicional(AnalizadorLexico lexico) throws IOException 
+    public static   void sent_condicional(AnalizadorLexico lexico) throws IOException 
     {
+        
         //System.out.println("SENT_CONDICIONAL");
         if(preanalisis.equalsIgnoreCase("token_if"))
         {
+            String tipoExp;
             match( "token_if",lexico);
-            expresion(lexico);
+            tipoExp = expresion(lexico);
+            System.out.println(tipoExp);
+            if(!tipoExp.equalsIgnoreCase("boolean"))
+            {
+                System.out.println("ERROR SEMANTICO SE ESPERABA UNA EXPESION BOOLEANA PARA LA SENTENCIA IF EN LA LINEA "+linea[1]);
+                System.exit(0);
+            }
             match("token_then",lexico); 
             sent_condicional1(lexico);
         }
@@ -754,12 +776,17 @@ import java.util.Stack;
 
 
 
- public static   void sent_repetitiva(AnalizadorLexico lexico) throws IOException {
+ public static void sent_repetitiva(AnalizadorLexico lexico) throws IOException 
+ {
     // System.out.println("SENT_REPETITIVA");
        if(preanalisis.equalsIgnoreCase("token_while"))
        {
 	match("token_while",lexico);
-	expresion(lexico);
+	String tipoExp = expresion(lexico);
+        if(!tipoExp.equalsIgnoreCase("boolean"))
+        {
+            System.out.println("ERROR SEMANTICO SE ESPERABA UNA EXPRESION DE TIPO BOOLEAN PARA LA SENTENCIA WHILE EN LA LINEA "+linea[1]);
+        }
 	match("token_do",lexico);
 	if ( preanalisis.equalsIgnoreCase("token_if")  ||  preanalisis.equalsIgnoreCase("token_read")  || 
 	      preanalisis.equalsIgnoreCase("token_write")  ||  preanalisis.equalsIgnoreCase("token_while") ||
@@ -823,14 +850,22 @@ import java.util.Stack;
 }
 
 
- public static   void expresion(AnalizadorLexico lexico) throws IOException {
-    // System.out.println("EXPRESION");
+ public static String expresion(AnalizadorLexico lexico) throws IOException {
+    String aux= "", aux2;
      if(preanalisis.equalsIgnoreCase("token_true")  ||  preanalisis.equalsIgnoreCase("token_false")  ||  preanalisis.equalsIgnoreCase("token_resta") ||         	
              preanalisis.equalsIgnoreCase("token_num")	||  preanalisis.equalsIgnoreCase("id")   ||  preanalisis.equalsIgnoreCase("parent_abre") ||     
              preanalisis.equalsIgnoreCase("token_not"))
      {
-	exp1(lexico); 
-	expresion1(lexico);
+	aux = exp1(lexico); 
+       
+	aux2 = expresion1(lexico);
+        if(!aux2.equalsIgnoreCase("") && !aux.equalsIgnoreCase("boolean"))
+            {
+                System.out.println("ERROR SEMANTICO SE ESPERA UN TIPO DE DATO BOOLEAN PARA REALIZAR LA OPERACION OR EN LA LINEA "
+                            +linea[1]);
+                    System.exit(0);
+            }
+        
      }
      else
      {
@@ -839,60 +874,89 @@ import java.util.Stack;
                        +" se espera TRUE, FALSE, -, NUM, ID, ( o NOT y se recibe "+linea[2]);
               System.exit(0);
      }
+     return aux;
  }     
 
 
- public static   void expresion1(AnalizadorLexico lexico) throws IOException  {
-    // System.out.println("EXPRESION1");
+ public static String expresion1(AnalizadorLexico lexico) throws IOException  
+ {
+        String aux="",aux2;
 	if (preanalisis.equalsIgnoreCase("token_or") ) 
 	{
-            
-		match("token_or",lexico); 
-                exp1(lexico); 
-		expresion1(lexico);
+            match("token_or",lexico); 
+            aux = exp1(lexico); 
+            aux2 = expresion1(lexico);
+            if(!aux2.equalsIgnoreCase("") && !aux.equalsIgnoreCase("boolean"))
+            {
+                System.out.println("ERROR SEMANTICO SE ESPERA UN TIPO DE DATO BOOLEAN PARA REALIZAR LA OPERACION OR EN LA LINEA "
+                            +linea[1]);
+                    System.exit(0);
+            }
 	}
+        return aux;
 }
 
- public static   void exp1(AnalizadorLexico lexico) throws IOException  {
-//System.out.println("EXP1");
-     if(preanalisis.equalsIgnoreCase("token_not")  ||  preanalisis.equalsIgnoreCase("token_true")
+ public static String exp1(AnalizadorLexico lexico) throws IOException  
+ {
+        String aux="", aux2;
+        if(preanalisis.equalsIgnoreCase("token_not")  ||  preanalisis.equalsIgnoreCase("token_true")
              ||  preanalisis.equalsIgnoreCase("token_false")  ||preanalisis.equalsIgnoreCase("token_resta")
              ||  preanalisis.equalsIgnoreCase("token_num") ||  preanalisis.equalsIgnoreCase("id")
              || preanalisis.equalsIgnoreCase("parent_abre") )
-    {
-	exp2(lexico); 
-	exp11(lexico);
-     }
-     else
-     {
+        {
+            aux = exp2(lexico); 
+           
+            aux2 = exp11(lexico);
+            if(!aux2.equalsIgnoreCase("") && !aux.equalsIgnoreCase("boolean"))
+            {
+                System.out.println("ERROR SEMANTICO SE ESPERA UN TIPO DE DATO BOOLEAN PARA REALIZAR LA OPERACION AND EN LA LINEA "
+                            +linea[1]);
+                    System.exit(0);
+            }
+        }
+        else
+        {
      //    System.out.println("ERROR EN EXP1");
-         System.out.println("Error de sintaxis en la linea "+linea[1]
+            System.out.println("Error de sintaxis en la linea "+linea[1]
                  +" se espera NOT, TRUE, FALSE, -, NUM, ID O ( y se recibe "+linea[2]);
-	System.exit(0);
-     }
-         
+            System.exit(0);
+        }
+        return aux; 
 }
 
 
- public static   void exp11(AnalizadorLexico lexico) throws IOException  {
+ public static String exp11(AnalizadorLexico lexico) throws IOException  {
 //System.out.println("EXP11");
+        String aux = "";
 	if (preanalisis.equalsIgnoreCase("token_and")) 
 	{
 		match( "token_and",lexico);
-		exp2(lexico); 
+		aux = exp2(lexico); 
+                if(!aux.equalsIgnoreCase("boolean"))
+                {
+                    System.out.println("ERROR SEMANTICO SE ESPERA UN TIPO DE DATO BOOLEAN PARA REALIZAR LA OPERACION AND EN LA LINEA "
+                            +linea[1]);
+                    System.exit(0);
+                }
 		exp11 (lexico);
 	}
-	
+	return aux;
 }
 
 
- public static   void exp2(AnalizadorLexico lexico) throws IOException  {
-
+ public static String exp2(AnalizadorLexico lexico) throws IOException  
+ {
+        String aux="";
         
 	if (preanalisis.equalsIgnoreCase("token_not"))  
 	{
 		match("token_not",lexico);
-		exp3(lexico);
+		aux = exp3(lexico);
+                if(!aux.equalsIgnoreCase("boolean"))
+                {
+                    System.out.println("ERROR SEMANTICO SE ESPERABA UN BOOLEAN PARA LA OPERACION NOT Y SE RECIBE "+aux+" en la linea "+linea[1]);
+                    System.exit(0);
+                }
                 
 	}
 	else 
@@ -901,7 +965,8 @@ import java.util.Stack;
 		 preanalisis.equalsIgnoreCase("token_resta")  ||  preanalisis.equalsIgnoreCase("token_num") || 
                  preanalisis.equalsIgnoreCase("id")  ||  preanalisis.equalsIgnoreCase("parent_abre"))
 		
-		exp3(lexico);
+                aux = exp3(lexico);
+         
               else
               {
      //            System.out.println("ERROR EN EXP2");
@@ -909,55 +974,87 @@ import java.util.Stack;
                              +" se espera NOT, TRUE, FALSE,- NUM,ID O ( y se recibe "+linea[2]);
                     System.exit(0);
               }
-        }      
+        }
+        return aux;
 }
 
-
- public static   void exp3(AnalizadorLexico lexico) throws IOException{
-     String aux,aux2;
-     if(preanalisis.equalsIgnoreCase("token_true")  ||  preanalisis.equalsIgnoreCase("token_false")  ||
-        preanalisis.equalsIgnoreCase("token_resta")  ||	preanalisis.equalsIgnoreCase("token_num") || 
+ public static String exp3(AnalizadorLexico lexico) throws IOException
+ {
+    String aux="",aux2="";
+    if(preanalisis.equalsIgnoreCase("token_true")  ||  preanalisis.equalsIgnoreCase("token_false")  ||
+        preanalisis.equalsIgnoreCase("token_resta")  || preanalisis.equalsIgnoreCase("token_num") ||
              preanalisis.equalsIgnoreCase("id")  ||
              preanalisis.equalsIgnoreCase("parent_abre"))
-     {
-	exp4(lexico);
-	exp31(lexico);
-     }
-     else
-     {
-       //  System.out.println("ERROR EN EXP3");
-	       System.out.println("Error de sintaxis  en la linea "+linea[1]
-                       +" se espera TRUE, FALSE, -, NUM, ID O ( y se recibe "+linea[2]);
-              System.exit(0);
-     }
- }     
-
-
- public static void exp31 (AnalizadorLexico lexico) throws IOException  {
-
-  
-     if (preanalisis.equalsIgnoreCase("token_mayor")  ||  preanalisis.equalsIgnoreCase("token_menor") ||  
-	     preanalisis.equalsIgnoreCase("token_igual") ||  preanalisis.equalsIgnoreCase("token_mayorI") ||
-		preanalisis.equalsIgnoreCase("token_menorI") ||  preanalisis.equalsIgnoreCase("token_distinto")) 
-	{
-            
-		if (preanalisis.equalsIgnoreCase("token_menor"))
-                    match("token_menor",lexico);
-                if (preanalisis.equalsIgnoreCase("token_igual"))
-                    match("token_igual",lexico); 
-		if (preanalisis.equalsIgnoreCase("token_mayor"))
-			match("token_mayor",lexico);
-		if(preanalisis.equalsIgnoreCase("token_menorI"))
-			match("token_menorI",lexico);
-		if(preanalisis.equalsIgnoreCase("token_mayorI"))
-			match("token_mayorI",lexico);
-		if(preanalisis.equalsIgnoreCase("token_distinto"))
-			match("token_distinto",lexico);
-		
-                exp4(lexico);
-		exp31(lexico);
+    {
+        aux = exp4(lexico);
+        
+        aux2 = exp31(lexico,aux);
+        if(aux2.equalsIgnoreCase(""))
+        {
+            aux2 = aux;
         }
+    }    
+    else
+    {
+       //  System.out.println("ERROR EN EXP3");
+        System.out.println("Error de sintaxis  en la linea "+linea[1]
+                       +" se espera TRUE, FALSE, -, NUM, ID O ( y se recibe "+linea[2]);
+        System.exit(0);
+    }
+    return aux2;
+ }    
+
+
+ public static String  exp31 (AnalizadorLexico lexico, String aux1) throws IOException  
+ {
+    String aux = "", aux2;
+    boolean soloEnt = true;
+    if (preanalisis.equalsIgnoreCase("token_mayor")  ||  preanalisis.equalsIgnoreCase("token_menor") ||  
+        preanalisis.equalsIgnoreCase("token_igual") ||  preanalisis.equalsIgnoreCase("token_mayorI") ||
+        preanalisis.equalsIgnoreCase("token_menorI") ||  preanalisis.equalsIgnoreCase("token_distinto"))
+    {
+       
+           
+        if (preanalisis.equalsIgnoreCase("token_menor"))
+            match("token_menor",lexico);
+        if (preanalisis.equalsIgnoreCase("token_igual"))
+        {
+            match("token_igual",lexico);
+            soloEnt = false;
+        }    
+        if (preanalisis.equalsIgnoreCase("token_mayor"))
+            match("token_mayor",lexico);
+        if(preanalisis.equalsIgnoreCase("token_menorI"))
+            match("token_menorI",lexico);
+        if(preanalisis.equalsIgnoreCase("token_mayorI"))
+            match("token_mayorI",lexico);
+        if(preanalisis.equalsIgnoreCase("token_distinto"))
+            match("token_distinto",lexico);
+ 
+        aux = exp4(lexico);
+        if(!aux.equalsIgnoreCase(aux1))
+        {
+            System.out.println("ERROR SEMANTICO SE COMPARAN DATOS DE DISTINTO TIPO EN LA LINEA "+linea[1]);
+            System.exit(0);
+        }
+        else
+        {
+            
+            if(soloEnt && !aux.equalsIgnoreCase("integer"))
+            {
+                System.out.println("ERROR SEMANTICO SE COMPARAN DATOS DE DISTINTO TIPO EN LA LINEA "+linea[1]);
+                System.exit(0);
+            }
+        }
+        
+        if(!aux.equalsIgnoreCase(""))
+        {
+            aux = "boolean";
+        }
+        aux2 = exp31(lexico,aux);
+    }
     
+   return aux;
  }        
 
  public static String exp4(AnalizadorLexico lexico) throws IOException  
@@ -1029,6 +1126,7 @@ import java.util.Stack;
        preanalisis.equalsIgnoreCase("id")  ||  preanalisis.equalsIgnoreCase("parent_abre"))
     {
         aux1 = factor(lexico); 
+
 	aux2 = termino1(lexico);
         
         if(!aux2.equalsIgnoreCase(""))
@@ -1162,7 +1260,8 @@ import java.util.Stack;
 	break;
 	case "parent_abre" :
             match("parent_abre",lexico);
-            expresion(lexico);
+            tipoExp = expresion(lexico);
+           // System.out.println(tipoExp);
             match("parent_cierra",lexico);
 	break;
 	default: 
@@ -1171,6 +1270,7 @@ import java.util.Stack;
             System.exit(0);
             break;
     }
+    
     return tipoExp;
 }
 
@@ -1235,39 +1335,48 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
     if(preanalisis.equalsIgnoreCase("parent_abre"))
     {
 	match("parent_abre",lexico);
-	expresion(lexico);
-        int posAux;
-	while(preanalisis.equalsIgnoreCase("coma") )
-	{
-            if(posParametro.peek() < (atributo.peek()).getCantParametros())
+        if(!atributo.isEmpty() && (atributo.peek().getTipo().equalsIgnoreCase("funcion") || atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
+        {
+            expresion(lexico);
+        
+            int posAux;
+            while(preanalisis.equalsIgnoreCase("coma") )
             {
-                match("coma",lexico);
-                expresion(lexico);
-                posAux = posParametro.peek();
+                if(posParametro.peek() < (atributo.peek()).getCantParametros())
+                {
+                    match("coma",lexico);
+                    expresion(lexico);
+                    posAux = posParametro.peek();
+                    posParametro.pop();
+                    posParametro.push(posAux+1);
+                }
+                else
+                {
+                    System.out.println("ERROR SEMANTICO para  "+
+                    atributo.peek().getNombre()+ " se requieren "+atributo.peek().getCantParametros()+
+                    " parametros en la linea "+linea[1] );
+                    System.exit(0);
+                }
+            }
+            if(posParametro.peek() == (atributo.peek().getCantParametros())-1)
+            {
+                match("parent_cierra",lexico);
                 posParametro.pop();
-                posParametro.push(posAux+1);
+                atributo.pop();
             }
             else
             {
-                System.out.println("ERROR SEMANTICO para  "+
-                atributo.peek().getNombre()+ " se requieren "+atributo.peek().getCantParametros()+
-                " parametros en la linea "+linea[1] );
+                //System.out.println("........................");
+                System.out.println("ERROR SEMANTICO se utilizaron "+ (posParametro.peek() )+
+                " parametros  y se requerian "+atributo.peek().getCantParametros()+" en la linea "+linea[1]);
                 System.exit(0);
             }
-	}
-        if(posParametro.peek() == (atributo.peek().getCantParametros())-1)
-        {
-            match("parent_cierra",lexico);
-            posParametro.pop();
-            atributo.pop();
         }
         else
         {
-            System.out.println("ERROR SEMANTICO se utilizaron "+ (posParametro.peek() )+
-            " parametros  y se requerian "+atributo.peek().getCantParametros()+" en la linea "+linea[1]);
-            System.exit(0);
+            System.out.println("ERROR SEMANTICO QUIERE USAR UNA VARIABLE COMO UNA FUNCION O PROCEDIMIENTO EN LA LINEA "+linea[1]);
+                System.exit(0);
         }
-	
     }
 }
 
