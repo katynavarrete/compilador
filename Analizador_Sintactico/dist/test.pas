@@ -18,7 +18,7 @@ begin
    pro(5,cal(9));
    
 
-   write(cal(10)+5-10-cal(9));
+   write(cal(10)+5-10-cal(true));
    {z+5;}
 
 end.

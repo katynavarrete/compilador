@@ -8,16 +8,17 @@ begin
     write(true);
 
 end;
-procedure pro(p:integer);
+procedure pro(p,h:integer);
 begin
     write(true);
 
 end;
 begin
-   z:=cal(cal(j))+5-10-cal(6);
-   pro(5);
-  
-   read(cal(5));
+   z:=cal(cal(9*7))+5-10-cal(6);
+   pro(5,cal(9));
+   
+
+   write(cal(10)+5-10-cal(9));
    {z+5;}
 
 end.

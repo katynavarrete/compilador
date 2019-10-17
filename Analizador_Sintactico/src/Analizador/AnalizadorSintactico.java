@@ -30,26 +30,26 @@ import java.util.Stack;
      public  static void main(String args[]) throws IOException
     {
        
-      // if(args.length == 1)
+       if(args.length == 1)
        {
            
            ts = new Tabla_de_Simbolos();
-         //   AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
+            AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             atributo = new Stack();
             posParametro = new Stack();
-         AnalizadorLexico lexico = new 
-                AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\"
-                        + "Analizador_Sintactico\\src\\Analizador\\test.pas");
+//         AnalizadorLexico lexico = new 
+//                AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\"
+//                        + "Analizador_Sintactico\\src\\Analizador\\test.pas");
             inicio(lexico);
             
             lexico.cerrarArchivo();
             
            
        }
-//       else
-//       {
-//           System.out.println("Falta el parametro del archivo");
-//       }
+       else
+       {
+           System.out.println("Falta el parametro del archivo");
+       }
     }
     public static void inicio(AnalizadorLexico lexico) throws IOException
     {
@@ -504,36 +504,42 @@ import java.util.Stack;
 	switch(preanalisis) 
         {
             case "parent_abre":
+                
                 if(!atributo.peek().getTipo().equalsIgnoreCase("procedimiento"))
                 {
                     System.out.println("ERROR SEMANTICO SE ESTA USANDO LA " +atributo.peek().getTipo()+" "+
                             atributo.peek().getNombre()+
                             " COMO SI FUERA UN PROCEDIMIENTO EN LA LINEA "+linea[1]);
                      System.exit(0);
-                }else{
+                }
+                else{
                 match("parent_abre",lexico); 
+                  
                 if(atributo != null &&(atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
                    atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
                 {    
                    
                     String tipoExp = expresion(lexico);
                     int posAux;
-                    
-                    //if(tipoPara.equalsIgnoreCase(tipoExp))
-                    {
+                    String tipoPara = "";
+                   //System.out.println(tipoExp);
+                 //  if(tipoPara.equalsIgnoreCase(tipoExp))
+                    { 
                         while (preanalisis.equalsIgnoreCase("coma"))
                         {   
                             if(posParametro.peek() < (atributo.peek()).getCantParametros())
                             {
                                 String parametro =(String) atributo.peek().getParametros().get(posParametro.peek());
                                 int pos = parametro.indexOf("@");
-                                String tipoPara = parametro.substring(pos+1);
+                                 tipoPara = parametro.substring(pos+1);
+                              
                                 if(!tipoPara.equalsIgnoreCase(tipoExp))
                                 {
                                     System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria un paratemetro de tipo "
                                     +tipoPara+" y se recibio un "+tipoExp);
                                     System.exit(0);
                                 }
+                              
                                 match("coma",lexico);
                                 tipoExp = expresion(lexico);
                                 
@@ -548,6 +554,19 @@ import java.util.Stack;
                                 " parametros en la linea "+linea[1] );
                                 System.exit(0);
                             }
+                        }
+                        if(tipoPara.equalsIgnoreCase(""))
+                        {
+                           String parametro =(String) atributo.peek().getParametros().get(posParametro.peek());
+                           int pos = parametro.indexOf("@");
+                           tipoPara = parametro.substring(pos+1);
+                           
+                        }
+                        if(!tipoPara.equalsIgnoreCase(tipoExp))
+                        {
+                            System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria un paratemetro de tipo "
+                            +tipoPara+" y se recibio un "+tipoExp);
+                            System.exit(0);
                         }
                        
                         if(posParametro.peek() == (atributo.peek().getCantParametros())-1)
@@ -609,7 +628,7 @@ import java.util.Stack;
             break;
             default:
                 
-              /*  if((atributo.peek().getTipo().equalsIgnoreCase("funcion")||atributo.peek().getTipo().equalsIgnoreCase("procedimiento"))
+                if((atributo.peek().getTipo().equalsIgnoreCase("funcion")||atributo.peek().getTipo().equalsIgnoreCase("procedimiento"))
                         &&
                         atributo.peek().getCantParametros()!= 0)
                 
@@ -618,7 +637,7 @@ import java.util.Stack;
                                 atributo.peek().getNombre()+ " se requieren "+atributo.peek().getCantParametros()+
                              " parametros y no se recibe ninguno ");
                         System.exit(0);
-                }   */
+                }   
                 if(!atributo.peek().getTipo().equalsIgnoreCase("procedimiento"))
                 {
                     System.out.println("ERROR SEMANTICO SE ESTA USANDO LA " +atributo.peek().getTipo()
@@ -890,7 +909,7 @@ import java.util.Stack;
                     match("parent_abre",lexico); 
                     String aux = linea[2];
                     match("id",lexico);
-                    match("parent_cierra",lexico);
+                    
                     Atributos a= ts.verificarElem(aux);
                     if(a!=null)
                     {
@@ -908,7 +927,7 @@ import java.util.Stack;
                                 +aux+" EN LA LINEA "+linea[1]+" LA CUAL NO ESTA DECLARADA");
                         System.exit(0);
                     }
-                   
+                   match("parent_cierra",lexico);
 	       }
                else
                {
@@ -1446,7 +1465,7 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
                 atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
         {
             String tipoExp=expresion(lexico);
-        
+            String tipoPara = "";
             int posAux;
             while(preanalisis.equalsIgnoreCase("coma") )
             {
@@ -1454,7 +1473,7 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
                 {
                     String parametro =(String) atributo.peek().getParametros().get(posParametro.peek());
                     int pos = parametro.indexOf("@");
-                    String tipoPara = parametro.substring(pos+1);
+                    tipoPara = parametro.substring(pos+1);
                     if(!tipoPara.equalsIgnoreCase(tipoExp))
                     {
                         System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria un paratemetro de tipo "
@@ -1476,6 +1495,19 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
                     System.exit(0);
                 }
             }
+            if(tipoPara.equalsIgnoreCase(""))
+                        {
+                           String parametro =(String) atributo.peek().getParametros().get(posParametro.peek());
+                           int pos = parametro.indexOf("@");
+                           tipoPara = parametro.substring(pos+1);
+                           
+                        }
+                        if(!tipoPara.equalsIgnoreCase(tipoExp))
+                        {
+                            System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria un paratemetro de tipo "
+                            +tipoPara+" y se recibio un "+tipoExp);
+                            System.exit(0);
+                        }
             if(posParametro.peek() == (atributo.peek().getCantParametros())-1)
             {
                 match("parent_cierra",lexico);
