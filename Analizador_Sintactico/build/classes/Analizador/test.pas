@@ -3,13 +3,23 @@ var
     y,a, b: BOOLEAN;
     z,j: Integer;
 
- function cal(a:integer; b: boolean):integer;
+ function cal(k:integer):integer;
 begin
-    read(a);
+    write(true);
+
+end;
+procedure pro(p:integer);
+begin
+    write(true);
+
 end;
 begin
-cal(cal(5+6,7<3=true),5<6);
-z:=7+3;
+   z:=cal(cal(j))+5-10-cal(6);
+   pro(5);
+  
+   read(cal(5));
+   {z+5;}
+
 end.
 
  

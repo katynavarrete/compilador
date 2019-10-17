@@ -29,9 +29,9 @@ public class Tabla_de_Simbolos
         while(i >= 0 && atributo == null )
         {
           aux= pila.get(i);
-            if(aux.containsKey(elem))
+            if(aux.containsKey(elem.toLowerCase()))
             {
-                atributo = (Atributos)aux.get(elem);
+                atributo = (Atributos)aux.get(elem.toLowerCase());
             }
             i--;
         }
@@ -41,7 +41,7 @@ public class Tabla_de_Simbolos
     {
         boolean exito = true;
         String [] arreglo = elem .split("#");
-        String nombre = arreglo[0];
+        String nombre = arreglo[0].toLowerCase();
         if(pila.empty())
         {
             pila.push(new HashMap());
