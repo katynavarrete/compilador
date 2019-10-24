@@ -37,14 +37,9 @@ import java.util.Stack;
             AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             atributo = new Stack();
             posParametro = new Stack();
-<<<<<<< Updated upstream
-//         AnalizadorLexico lexico = new 
-//                AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\"
-//                        + "Analizador_Sintactico\\src\\Analizador\\test.pas");
-=======
-         AnalizadorLexico lexico = new 
-                AnalizadorLexico("C:C:\\Users\\XENIXS\\Documents\\NetBeansProjects\\Analizador\\Analizador_Sintactico\\src\\Analizador\\test.pas");
->>>>>>> Stashed changes
+
+ //        AnalizadorLexico lexico = new AnalizadorLexico("C:C:\\Users\\XENIXS\\Documents\\NetBeansProjects\\Analizador\\Analizador_Sintactico\\src\\Analizador\\test.pas");
+
             inicio(lexico);
             
             lexico.cerrarArchivo();
