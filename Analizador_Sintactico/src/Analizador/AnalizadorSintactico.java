@@ -30,26 +30,27 @@ import java.util.Stack;
      public  static void main(String args[]) throws IOException
     {
        
-       if(args.length == 1)
+      // if(args.length == 1)
        {
            
            ts = new Tabla_de_Simbolos();
-            AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
+          //  AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             atributo = new Stack();
             posParametro = new Stack();
-//         AnalizadorLexico lexico = new 
-//                AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\"
-//                        + "Analizador_Sintactico\\src\\Analizador\\test.pas");
+         AnalizadorLexico lexico = new 
+                AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\"
+                        + "Analizador_Sintactico\\src\\Analizador\\test.pas");
             inicio(lexico);
             
             lexico.cerrarArchivo();
             
            
        }
-       else
+      /** else
        {
            System.out.println("Falta el parametro del archivo");
        }
+       */
     }
     public static void inicio(AnalizadorLexico lexico) throws IOException
     {
@@ -107,10 +108,18 @@ import java.util.Stack;
 		match("dos_puntos",lexico);
                 int pos = preanalisis.lastIndexOf('_');
                 String nomTipo = preanalisis.substring(pos+1);
-                int i = 0;
+                int i;
                 for ( i = 0; i < aux.size(); i++) 
                 {
-                    ts.insertarElem((aux.get(i))+"#"+alcance+"#variable#"+nomTipo);
+                 //   System.out.println(aux.get(i));
+                    boolean p =ts.insertarElem((aux.get(i))+"#"+alcance+"#variable#"+nomTipo);
+                  //  System.out.println(p);
+                    if(p == false) 
+                    {
+                        
+                       System.out.println(" en la linea "+linea[1]);
+                       System.exit(0);
+                    }
                    // cad+= aux.get(i)+"?"+nomTipo+"&";
                 }
                
@@ -196,8 +205,10 @@ import java.util.Stack;
                             tipo(lexico);
                         }
                         if(!ts.insertarElem(nombre+"#"+alcancePadre+"#procedimiento#"+cadena))
+                        {
+                            System.out.println(" en la linea "+linea[1]);
                             System.exit(0);
-                        
+                        }
                         ts.insertarTS();
                         
                         String [] parAux = cadena.split("&");
@@ -317,15 +328,23 @@ import java.util.Stack;
                 match("dos_puntos",lexico);
                 int pos = preanalisis.lastIndexOf("_");
                 String nomTipo = preanalisis.substring(pos+1);
-                
-                if(conParametros && !ts.insertarElem(nombre+"#"+alcancePadre+"#funcion#"+cadena+"#"+nomTipo))
+               
+                System.out.println("");
+                if(conParametros )
                 {
-                    System.exit(0);
+                    if( !ts.insertarElem(nombre+"#"+alcancePadre+"#funcion#"+cadena+"#"+nomTipo))
+                    {
+                        System.out.println(" --------- en la linea "+linea[1]);
+                        System.exit(0);
+                    }
+                    
                 }
                 else
                 {
-                    if(!ts.insertarElem(nombre+"#"+alcancePadre+"#funcion#"+nomTipo))
+                   if(!ts.insertarElem(nombre+"#"+alcancePadre+"#funcion#"+nomTipo))
                     {
+                        ts.imprimir();
+                        System.out.println("********* en la linea "+linea[1]);
                         System.exit(0);
                     }
                 }
@@ -345,6 +364,7 @@ import java.util.Stack;
                     //  System.out.println("nom "+nomV+"    "+tipoDato);
                         if(!ts.insertarElem(nomV+"#"+alcance+"#variable#"+tipoDato))
                         {
+                           
                             System.exit(0);
                         }
                     }
@@ -515,7 +535,7 @@ import java.util.Stack;
                 else{
                 match("parent_abre",lexico); 
                   
-                if(atributo != null &&(atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
+                if(!atributo.isEmpty() &&(atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
                    atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
                 {    
                    
@@ -598,7 +618,7 @@ import java.util.Stack;
             break;
             case "asignacion":
                
-                if(atributo != null && (atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
+                if(!atributo.isEmpty() && (atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
                         atributo.peek().getTipo().equalsIgnoreCase("procedimiento") ))
                 {
                     System.out.println("ERROR SEMANTICO en la linea "+linea[1]+" se le esta haciendo una asignacion a " +
@@ -718,7 +738,7 @@ import java.util.Stack;
             String tipoExp;
             match( "token_if",lexico);
             tipoExp = expresion(lexico);
-            System.out.println(tipoExp);
+         //   System.out.println(tipoExp);
             if(!tipoExp.equalsIgnoreCase("boolean"))
             {
                 System.out.println("ERROR SEMANTICO SE ESPERABA UNA EXPESION BOOLEANA PARA LA SENTENCIA IF EN LA LINEA "+linea[1]);
@@ -943,8 +963,10 @@ import java.util.Stack;
 
  public static String expresion(AnalizadorLexico lexico) throws IOException {
     String aux= "", aux2;
-     if(preanalisis.equalsIgnoreCase("token_true")  ||  preanalisis.equalsIgnoreCase("token_false")  ||  preanalisis.equalsIgnoreCase("token_resta") ||         	
-             preanalisis.equalsIgnoreCase("token_num")	||  preanalisis.equalsIgnoreCase("id")   ||  preanalisis.equalsIgnoreCase("parent_abre") ||     
+     if(preanalisis.equalsIgnoreCase("token_true")  ||  preanalisis.equalsIgnoreCase("token_false")  
+             ||  preanalisis.equalsIgnoreCase("token_resta") ||         	
+             preanalisis.equalsIgnoreCase("token_num")	||  preanalisis.equalsIgnoreCase("id") 
+             ||  preanalisis.equalsIgnoreCase("parent_abre") ||     
              preanalisis.equalsIgnoreCase("token_not"))
      {
 	aux = exp1(lexico); 
@@ -1304,6 +1326,7 @@ import java.util.Stack;
         case  "token_resta":
             match("token_resta",lexico); 
             factor1(lexico);
+           
             tipoExp = "integer";
 	break;
 	case "id":
@@ -1376,28 +1399,33 @@ import java.util.Stack;
 {
     boolean fop= false;
     String [] param = null;
-    if(atributo != null &&(atributo.peek().getTipo().equalsIgnoreCase("funcion") || 
+    
+    if(!atributo.isEmpty() &&(atributo.peek().getTipo().equalsIgnoreCase("funcion") || 
             atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
     {
+        
         fop = true;
         param =((String) atributo.peek().getParametros().get(posParametro.peek())).split("@");
                 
     }
+
     switch(preanalisis) 
     {
 	case  "token_num":
-            if(fop)
+            //creo que el control de los paramatros de funciones y procedimientos
+           /* if(fop)
             {
-                if(!param[1].equalsIgnoreCase("integer"))
+              //  System.out.println(param[1]);
+               if(!param[1].equalsIgnoreCase("integer"))
                 {
-                    System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" se espera un "+param[1]
+                    System.out.println("ERROR SEMANTICO EN LA LINEA  "+linea[1]+" se espera un "+param[1]
                             + " y se recibe un integer");
                     System.exit(0);
                 }
                 int auxPos = posParametro.peek();
                 posParametro.pop();
                 posParametro.push(auxPos+1);
-            }
+            }*/
             match("token_num",lexico);
 	break;
 	case "id":
@@ -1436,7 +1464,7 @@ import java.util.Stack;
 	case "parent_abre" :
             match("parent_abre",lexico);
             String tipoExp= expresion(lexico); 
-            if(!tipoExp.equalsIgnoreCase("integerr"))
+            if(!tipoExp.equalsIgnoreCase("integer"))
             {
                 System.out.println("ERROR SEMANTICO SE ESPERA UNA EXPRESION DE TIPO INTEGER Y SE USA EXPRESION DE TIPO "
                         +tipoExp+" EN LA LINEA "+linea[1]);

@@ -47,7 +47,7 @@ public class Tabla_de_Simbolos
             pila.push(new HashMap());
         }
         HashMap aux = pila.peek();
-        if(!aux.containsKey(nombre))
+        if(!aux.containsKey(nombre.toLowerCase()))
         {
             Atributos atributo = new Atributos(elem);
             aux.put(nombre, atributo);
@@ -55,29 +55,13 @@ public class Tabla_de_Simbolos
         }
         else
         {
-            /*
-                cambiar de lugar los imprimir de los errores para que puedan mostrar
-                la linea
-            */
-            if(!((Atributos)aux.get(nombre)).getTipo().equalsIgnoreCase(arreglo[2])  )
-            {
-                System.out.println("Error semantico se quiere usar un atributo como "+((Atributos)aux.get(nombre)).getTipo()+
-                        " y como "+arreglo[2]);
-                exito = false;
-            }
-            else
-            {
-                if(((Atributos)aux.get(nombre)).getTipo().equalsIgnoreCase("variable")
-                        &&!((Atributos)aux.get(nombre)).getTipoDato().equalsIgnoreCase(arreglo[3]))
-                {
-                   System.out.println("Error semantico se quiere usar una misma variable como "+((Atributos)aux.get(nombre)).getTipoDato()+
-                            " y como "+arreglo[3]);
-                    exito = false;
-                }
-            }
+            exito=false;
+            System.out.print("ERROR SEMANTICO: SE QUIERE DECLARAR "+nombre+ " LA CUAL ESTA DECLARADA"  );
                 
             
         }
+     //  System.out.println("exito "+exito+"  " +elem);
+     //imprimir();
         return exito;
     }
     public void insertarTS()

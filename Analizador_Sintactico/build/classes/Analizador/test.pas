@@ -1,26 +1,23 @@
-program  algo ;
-var
-    y,a, b: BOOLEAN;
-    z,j: Integer;
+Program Conductor_de_Prueba;
+Var
+  c,h,r: integer;
+  r2:boolean;
 
- function cal(k:integer):integer;
+procedure pru2(p: boolean);
 begin
-    write(true);
-
+  {pru:=18}
+  r := 4;
 end;
-procedure pro(p,h:integer);
-begin
-    write(true);
 
-end;
-begin
-   z:=cal(cal(9*7))+5-10-cal(6);
-   pro(5,cal(9));
-   
+Begin
+  read(c);
+{((c > -(5*-4*r))}
+  pru2((c > -(5*-4*r)){or (3<>5) and true or (r>2) } );
+  if r2 then
+  begin
+     write(1)
+  end
+  else
+     write(0);
 
-   write(cal(10)+5-10-cal(9));
-   {z+5;}
-
-end.
-
- 
+End.
