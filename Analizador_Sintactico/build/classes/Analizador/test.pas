@@ -1,23 +1,40 @@
 Program Conductor_de_Prueba;
 Var
   c,h,r: integer;
-  r2:boolean;
 
-procedure pru2(p: boolean);
+
+procedure Rite(a: integer);
+begin
+end;
+
+
+procedure pru2(b:boolean;a:integer);
+
 begin
   {pru:=18}
   r := 4;
 end;
+function fun(b:boolean;a:integer):integer;
 
+begin
+  {pru:=18}
+  r := 4;
+end;
 Begin
-  read(c);
-{((c > -(5*-4*r))}
-  pru2((c > -(5*-4*r)){or (3<>5) and true or (r>2) } );
-  if r2 then
+  PRU2(true,-5);
+  c := 4;
+  if (55 > -55) or true and (3>3) then
   begin
-     write(1)
+     h := fun;
+     write(0);
+     Rite(0);
   end
   else
-     write(0);
+     {writeln(1);}
+     Rite(1);
 
+  if 4>7 then
+    r := 1
+  else
+    r := 0
 End.
