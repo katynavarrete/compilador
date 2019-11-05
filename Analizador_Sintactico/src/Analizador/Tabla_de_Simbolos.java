@@ -16,10 +16,13 @@ import java.util.Stack;
 public class Tabla_de_Simbolos 
 {
      private Stack <HashMap> pila;
+     private Stack <String> alcance;
     
     public Tabla_de_Simbolos()
     {
        pila = new Stack();
+       alcance = new Stack();
+       
     }
     public Atributos verificarElem(String elem)
     {
@@ -45,6 +48,7 @@ public class Tabla_de_Simbolos
         if(pila.empty())
         {
             pila.push(new HashMap());
+            alcance.push("global");
         }
         HashMap aux = pila.peek();
         if(!aux.containsKey(nombre.toLowerCase()))
@@ -64,18 +68,27 @@ public class Tabla_de_Simbolos
      //imprimir();
         return exito;
     }
-    public void insertarTS()
+    public void insertarTS(String alcance)
     {
         pila.push(new HashMap());
+        this.alcance.push(alcance);
+        
     }
     public void eliminarTS()
     {
         if(!pila.empty())
             pila.pop();
+        if(!alcance.empty())
+            alcance.pop();
+    }
+    public String alcanceActual()
+    {
+       return alcance.peek();
     }
      
     public void imprimir()
     {
+        System.out.println(alcance.peek());
         HashMap map = pila.peek();
         map.forEach((k,v)-> System.out.println(((Atributos)v).getAtributos()));
         System.out.println("------------------------------");

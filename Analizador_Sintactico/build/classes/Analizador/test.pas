@@ -1,40 +1,48 @@
 Program Conductor_de_Prueba;
 Var
   c,h,r: integer;
+  r2:boolean;
 
-
-procedure Rite(a: integer);
+procedure pro(p: integer);
+Var
+  k,j: integer;
+ 
 begin
-end;
-
-
-procedure pru2(b:boolean;a:integer);
-
-begin
-  {pru:=18}
+  r2:=true;
   r := 4;
-end;
-function fun(b:boolean;a:integer):integer;
 
-begin
-  {pru:=18}
-  r := 4;
 end;
+
+function fun(p: integer;b:boolean):integer;
+begin
+  r2:=true;
+  r := 4;
+pro(fun(-10,false));
+fun:=fun(fun(fun(10,true),9=10),9<5);
+fun:=fun(fun(fun(10-10+50*-9+25/4,8<9),true),false);
+
+end;
+function fun1(a,b:boolean):integer;
+begin
+  r2:=true;
+  r := 4;
+pro(fun(-10,false));
+fun:=fun(fun(fun(10,true),9=10),9<5);
+fun1:=fun(fun(fun(10-10+50*-9+25/4,8<9),true),false);
+
+end;
+
 Begin
-  PRU2(true,-5);
-  c := 4;
-  if (55 > -55) or true and (3>3) then
+  read(c);
+
+ c:= fun(5, (((c > -(5*4*r))) or (3<>5) and true or (r>2)));
+pro(8978);
+c:=fun1(9<8=true,false=(96<-87 or 97/8 <> 987));
+  if c<(-8+10*-9/-9*10+fun(4-2,-7<>-9=true)) then
   begin
-     h := fun;
-     write(0);
-     Rite(0);
+     read(c);
   end
   else
-     {writeln(1);}
-     Rite(1);
+     write(0);
 
-  if 4>7 then
-    r := 1
-  else
-    r := 0
 End.

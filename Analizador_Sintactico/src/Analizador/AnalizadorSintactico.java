@@ -7,7 +7,9 @@ package Analizador;
 
 
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Stack;
@@ -24,6 +26,7 @@ import java.util.Stack;
      public static String[] linea;
      public static Tabla_de_Simbolos ts;
      public static Stack<Atributos> atributo;
+     public static  PrintWriter mepa ;
     // public static Stack<Integer>  posParametro;
    //  public static boolean puedeF=false;
      
@@ -37,12 +40,19 @@ import java.util.Stack;
           //  AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             atributo = new Stack();
 //            posParametro = new Stack();
-         AnalizadorLexico lexico = new 
+        AnalizadorLexico lexico = new 
                 AnalizadorLexico("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\"
                         + "Analizador_Sintactico\\src\\Analizador\\test.pas");
-            inicio(lexico);
+        FileWriter fichero = null;
+        mepa = null;
+        fichero = new FileWriter("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador\\"
+                        + "Analizador_Sintactico\\src\\Analizador\\int.mepa");
+        mepa = new PrintWriter(fichero);
+        inicio(lexico);
             
-            lexico.cerrarArchivo();
+        lexico.cerrarArchivo();
+        if(fichero != null)
+            fichero.close();
             
            
        }
@@ -63,12 +73,13 @@ import java.util.Stack;
 	{
             match("token_program",lexico);
             ts.insertarElem((linea[2]+"#global#nombre programa"));
-           
+            mepa.println("INPP");
             match("id",lexico);
             match("punto_y_coma",lexico);
             if(preanalisis.equalsIgnoreCase("token_var"))   
 		def_variable(lexico,"global");
-            //sigue aca
+            if(preanalisis.equalsIgnoreCase("token_function")  ||  preanalisis.equalsIgnoreCase("token_procedure"))
+                mepa.println("DSVS l1");
             while ( preanalisis.equalsIgnoreCase("token_function")  ||  preanalisis.equalsIgnoreCase("token_procedure"))
             {
                 subprograma(lexico,"global");
@@ -99,11 +110,13 @@ import java.util.Stack;
             {
                 aux.add(linea[2]);
 		match("id",lexico);
+                mepa.println("RMEM 1");
 		while (preanalisis.equalsIgnoreCase("coma"))
 		{
                     match("coma",lexico);
                     aux.add(linea[2]);
                     match("id",lexico);
+                    mepa.println("RMEM 1");
 		}
 		match("dos_puntos",lexico);
                 int pos = preanalisis.lastIndexOf('_');
@@ -127,8 +140,7 @@ import java.util.Stack;
 		tipo(lexico); 
                 match("punto_y_coma",lexico);
             }
-         //  ts.imprimir();
-          //  System.out.println("-----------------------------------------");
+        
 	}
 	else
 	{
@@ -151,9 +163,10 @@ import java.util.Stack;
                 
                 String alcance = "local en "+nombre;
                 match("id",lexico); 
-                
+                mepa.println("ENPR");
                //aca agregar un insertar en la TS
                 
+                //parametros de la funcion
                 if(preanalisis.equalsIgnoreCase("parent_abre") )
                 {
                     match("parent_abre",lexico);
@@ -209,7 +222,7 @@ import java.util.Stack;
                             System.out.println(" en la linea "+linea[1]);
                             System.exit(0);
                         }
-                        ts.insertarTS();
+                        ts.insertarTS(nombre);
                         
                         String [] parAux = cadena.split("&");
                         for (int j = 0; j < parAux.length; j++) 
@@ -232,7 +245,7 @@ import java.util.Stack;
                 else
                 {
                     ts.insertarElem(nombre+"#"+alcancePadre+"#procedimiento");
-                    ts.insertarTS();
+                    ts.insertarTS(nombre);
                     
                 }
                 match("punto_y_coma",lexico);
@@ -349,7 +362,7 @@ import java.util.Stack;
                     }
                 }
                     
-                ts.insertarTS();
+                ts.insertarTS(nombre);
                 
                 String [] parAux = cadena.split("&");
                 if(!parAux[0].equalsIgnoreCase(""))
@@ -496,7 +509,7 @@ import java.util.Stack;
                     //System.out.println("id "+linea[2]);
                     
                     match("id",lexico);
-                    ///corregir aca !!!!!
+                    
                     sentencia_simple1(lexico);
                     
                 }
@@ -537,8 +550,8 @@ import java.util.Stack;
                 else{
                 match("parent_abre",lexico); 
                   
-                if(!atributo.isEmpty() &&(atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
-                   atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
+                if(!atributo.isEmpty() && atributo.peek().getTipo().equalsIgnoreCase("procedimiento") && 
+                        atributo.peek().getCantParametros()>0)
                 {    
                    
                     String tipoExp = expresion(lexico);
@@ -577,12 +590,21 @@ import java.util.Stack;
                                 System.exit(0);
                             }
                         }
-                        if( atributo.peek().getCantParametros()>0)
+                        if( atributo.peek().getCantParametros()>0  )
                         {
-                           String parametro =(String) atributo.peek().getParametros().get(posAux);
-                           int pos = parametro.indexOf("@");
-                           tipoPara = parametro.substring(pos+1);
-                           posAux++;
+                            if(posAux < atributo.peek().getCantParametros())
+                            {
+                                String parametro =(String) atributo.peek().getParametros().get(posAux);
+                                int pos = parametro.indexOf("@");
+                                tipoPara = parametro.substring(pos+1);
+                                posAux++;
+                            }    
+                            else
+                            {
+                                System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria "
+                                +atributo.peek().getCantParametros());
+                                System.exit(0);
+                            }
                            
                         }
                         if(!tipoPara.equalsIgnoreCase(tipoExp))
@@ -606,25 +628,28 @@ import java.util.Stack;
                             System.exit(0);
                         }
                     }
-                 /*   else
-                    {
-                        System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria un paratemetro de tipo "
-                        +tipoPara+" y se recibio un "+tipoExp);
-                        System.exit(0);
-                    }*/
-                }    
+                
+                }  
                 else
                 {
-                    System.out.println("ERROR SEMANTICO SE QUIERE USAR UNA VARIABLE COMO FUNCION O PROCEDIMIENTO EN LA LINEA "+linea[1]);
-                        System.exit(0);
+                    if(!atributo.peek().getTipo().equalsIgnoreCase("procedimiento"))
+                        System.out.println("ERROR SEMANTICO SE QUIERE USAR UNA VARIABLE COMO FUNCION O PROCEDIMIENTO EN LA LINEA "+linea[1]);
+                    else
+                        System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" EL PROCEDIMIENTO "+
+                                atributo.peek().getNombre()+" no requiere parametros");
+                    System.exit(0);
                 }
         }    
             break;
             case "asignacion":
-               
-                if(!atributo.isEmpty() && (atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
-                        atributo.peek().getTipo().equalsIgnoreCase("procedimiento") ))
+                
+                if(!atributo.isEmpty() && 
+                   ((atributo.peek().getTipo().equalsIgnoreCase("funcion") && 
+                        !atributo.peek().getNombre().equalsIgnoreCase(ts.alcanceActual()))||
+                    atributo.peek().getTipo().equalsIgnoreCase("procedimiento") ))
                 {
+                    //System.out.println(atributo.peek().getAtributos());
+                   
                     System.out.println("ERROR SEMANTICO en la linea "+linea[1]+" se le esta haciendo una asignacion a " +
                             atributo.peek().getTipo());
                     System.exit(0);
@@ -1355,21 +1380,27 @@ import java.util.Stack;
                    }
                     
                 }
-               
-                factor2(lexico);
-                if(aux.getTipo().equalsIgnoreCase("funcion"))
-                    tipoExp = aux.getTipoRetorno();
-                else
+                if(!aux.getTipo().equalsIgnoreCase("procedimiento"))
                 {
-                    if(aux.getTipo().equalsIgnoreCase("variable"))
-                    {
-                        tipoExp = aux.getTipoDato();
-                    }
+                   
+                    factor2(lexico);
+                    if(aux.getTipo().equalsIgnoreCase("funcion"))
+                        tipoExp = aux.getTipoRetorno();
                     else
                     {
-                        System.out.println("procedimiento");
+                        if(aux.getTipo().equalsIgnoreCase("variable"))
+                        {
+                            tipoExp = aux.getTipoDato();
+                        }
                     }
                 }
+                else
+                {
+                    System.out.println("ERROR SEMANTICO SE QUIERE USAR UN PROCEDIMIENTO COMO UNA FUNCION O VARIABLE EN LA LINEA "
+                    +linea[1]);
+                    System.exit(0);
+                }
+                        
             }
             else
             {
@@ -1492,8 +1523,7 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
     {
 	match("parent_abre",lexico);
         if(!atributo.isEmpty() && 
-                (atributo.peek().getTipo().equalsIgnoreCase("funcion") ||
-                atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
+                (!atributo.peek().getTipo().equalsIgnoreCase("variable")) && atributo.peek().getCantParametros()>0)
         {
             
             String tipoExp=expresion(lexico);
@@ -1511,7 +1541,8 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
                         tipoPara = parametro.substring(pos+1);
                         if(!tipoPara.equalsIgnoreCase(tipoExp))
                         {
-                            System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria un paratemetro de tipo "
+                            System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "
+                                    +atributo.peek().getNombre()+" requeria un paratemetro de tipo "
                             +tipoPara+" y se recibio un "+tipoExp);
                             System.exit(0);
                         }
@@ -1529,14 +1560,25 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
                         System.exit(0);
                     }
                 }
-                if(atributo.peek().getCantParametros()>0)
+                if(atributo.peek().getCantParametros() > 0 )
                 {
-                    String parametro =(String) atributo.peek().getParametros().get(posAux);
-                    int pos = parametro.indexOf("@");
-                    tipoPara = parametro.substring(pos+1);
+                    if(posAux < atributo.peek().getCantParametros())
+                    {
+                        String parametro =(String) atributo.peek().getParametros().get(posAux);
+                        int pos = parametro.indexOf("@");
+                        tipoPara = parametro.substring(pos+1);
                     //    posAux++;
+                    }
+                    else
+                    {
+                        System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria "
+                                +atributo.peek().getCantParametros());
+                        System.exit(0);
+                    }
+                    
                           
                 }
+               
                 if(!tipoPara.equalsIgnoreCase(tipoExp))
                 {
                     System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+atributo.peek().getNombre()+" requeria un paratemetro de tipo "
@@ -1570,8 +1612,16 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
         }
         else
         {
-            System.out.println("ERROR SEMANTICO QUIERE USAR LA VARIABLE "+ atributo.peek().getNombre()+" COMO UNA FUNCION O PROCEDIMIENTO EN LA LINEA "+linea[1]);
-                System.exit(0);
+            if(atributo.peek().getTipo().equalsIgnoreCase("variable"))
+            {
+                System.out.println("ERROR SEMANTICO QUIERE USAR LA VARIABLE "+ atributo.peek().getNombre()+
+                        " COMO UNA FUNCION O PROCEDIMIENTO EN LA LINEA "+linea[1]);
+               
+            }
+            else
+                System.out.println("ERROR SEMANTICO EN LA LINEA "+linea[1]+" "+
+                       atributo.peek().getNombre()+" no requiere parametros" );
+            System.exit(0);   
         }
     }
 }
