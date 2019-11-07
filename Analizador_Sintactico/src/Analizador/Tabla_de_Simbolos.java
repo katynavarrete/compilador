@@ -15,26 +15,25 @@ import java.util.Stack;
  */
 public class Tabla_de_Simbolos 
 {
-     private Stack <HashMap> pila;
-     private Stack <String> alcance;
+    private Stack <Ts_auxiliar> pila;
+    private int nivel = 0;
     
     public Tabla_de_Simbolos()
     {
        pila = new Stack();
-       alcance = new Stack();
-       
+   
     }
     public Atributos verificarElem(String elem)
     {
         Atributos atributo = null;
-        HashMap aux;
+        Ts_auxiliar aux;
         int i = pila.size()-1;
         while(i >= 0 && atributo == null )
         {
           aux= pila.get(i);
-            if(aux.containsKey(elem.toLowerCase()))
+            if(aux.verificarElem(elem.toLowerCase()))
             {
-                atributo = (Atributos)aux.get(elem.toLowerCase());
+                atributo = (Atributos)aux.getAtributos(elem);
             }
             i--;
         }
@@ -42,56 +41,45 @@ public class Tabla_de_Simbolos
     }
     public boolean insertarElem(String elem)
     {
-        boolean exito = true;
-        String [] arreglo = elem .split("#");
-        String nombre = arreglo[0].toLowerCase();
+       boolean exito;
         if(pila.empty())
         {
-            pila.push(new HashMap());
-            alcance.push("global");
-        }
-        HashMap aux = pila.peek();
-        if(!aux.containsKey(nombre.toLowerCase()))
-        {
-            Atributos atributo = new Atributos(elem);
-            aux.put(nombre, atributo);
-          //  this.imprimir();
-        }
-        else
-        {
-            exito=false;
-            System.out.print("ERROR SEMANTICO: SE QUIERE DECLARAR "+nombre+ " LA CUAL ESTA DECLARADA"  );
-                
+            pila.push(new Ts_auxiliar("global",nivel));
             
         }
-     //  System.out.println("exito "+exito+"  " +elem);
-     //imprimir();
+        Ts_auxiliar aux = pila.peek();
+        exito = aux.insertarElem(elem);
+       
         return exito;
     }
     public void insertarTS(String alcance)
     {
-        pila.push(new HashMap());
-        this.alcance.push(alcance);
+        nivel++;
+        pila.push(new Ts_auxiliar(alcance,nivel));
+
         
     }
     public void eliminarTS()
     {
         if(!pila.empty())
+        {
             pila.pop();
-        if(!alcance.empty())
-            alcance.pop();
+            nivel--;
+        }    
+        
+        
     }
     public String alcanceActual()
     {
-       return alcance.peek();
+       return pila.peek().getAlcance();
     }
      
     public void imprimir()
     {
-        System.out.println(alcance.peek());
-        HashMap map = pila.peek();
-        map.forEach((k,v)-> System.out.println(((Atributos)v).getAtributos()));
-        System.out.println("------------------------------");
+        for (int i = pila.size(); i >-1; i--) 
+        {
+            pila.peek().imprimir();
+        }
                 
     }
     

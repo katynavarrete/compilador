@@ -27,6 +27,7 @@ import java.util.Stack;
      public static Tabla_de_Simbolos ts;
      public static Stack<Atributos> atributo;
      public static  PrintWriter mepa ;
+    
     // public static Stack<Integer>  posParametro;
    //  public static boolean puedeF=false;
      
@@ -35,7 +36,7 @@ import java.util.Stack;
        
       // if(args.length == 1)
        {
-           
+          
            ts = new Tabla_de_Simbolos();
           //  AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             atributo = new Stack();
@@ -73,13 +74,17 @@ import java.util.Stack;
 	{
             match("token_program",lexico);
             ts.insertarElem((linea[2]+"#global#nombre programa"));
-            mepa.println("INPP");
             match("id",lexico);
+            mepa.println("INPP");
             match("punto_y_coma",lexico);
             if(preanalisis.equalsIgnoreCase("token_var"))   
 		def_variable(lexico,"global");
             if(preanalisis.equalsIgnoreCase("token_function")  ||  preanalisis.equalsIgnoreCase("token_procedure"))
+            {   
                 mepa.println("DSVS l1");
+                
+            }
+            
             while ( preanalisis.equalsIgnoreCase("token_function")  ||  preanalisis.equalsIgnoreCase("token_procedure"))
             {
                 subprograma(lexico,"global");
@@ -163,7 +168,7 @@ import java.util.Stack;
                 
                 String alcance = "local en "+nombre;
                 match("id",lexico); 
-                mepa.println("ENPR");
+                mepa.println("ENPR 1");
                //aca agregar un insertar en la TS
                 
                 //parametros de la funcion
@@ -489,6 +494,7 @@ import java.util.Stack;
         {
             case  "token_if":
                 sent_condicional(lexico);
+                
             break;
             case  "token_write":
                 sent_E_S(lexico);
@@ -1340,31 +1346,25 @@ import java.util.Stack;
 	case  "token_true":
             tipoExp = "boolean";
             match("token_true",lexico);
+            mepa.println("APCT 1");
 	break;
 	case  "token_false":
             tipoExp = "boolean";
             match("token_false",lexico);
+            mepa.println("APCT 0");
 	break;
         case  "token_resta":
             match("token_resta",lexico); 
             factor1(lexico);
-           
-            tipoExp = "integer";
+            mepa.println("UMEN");
+            
+           tipoExp = "integer";
 	break;
 	case "id":
             Atributos aux = (ts.verificarElem(linea[2]));
             if(aux != null)
             {   
-           /*     if(fop)
-                {
-                    if(aux.getTipo().equalsIgnoreCase("procedimiento"))
-                    {
-                        System.out.println("ERROR SEMANTICO SE QUIERE USAR un procedimiento en como argumento de una fucnion en la linea  "
-                        +linea[1]);
-                        System.exit(0);
-                    }
-                    
-                }*/
+          
                 match("id",lexico);
                 if(aux.getTipo().equalsIgnoreCase("funcion"))
                 {
@@ -1385,12 +1385,16 @@ import java.util.Stack;
                    
                     factor2(lexico);
                     if(aux.getTipo().equalsIgnoreCase("funcion"))
+                    {
                         tipoExp = aux.getTipoRetorno();
+                    }    
                     else
                     {
                         if(aux.getTipo().equalsIgnoreCase("variable"))
                         {
                             tipoExp = aux.getTipoDato();
+                            mepa.println("APVL "+aux.getPosMemoria());
+                            
                         }
                     }
                 }
@@ -1410,6 +1414,7 @@ import java.util.Stack;
 	break;
 	case  "token_num":
             tipoExp = "integer";
+            mepa.println("APCT "+linea[2]);
             match("token_num",lexico);
 	break;
 	case "parent_abre" :
@@ -1431,35 +1436,10 @@ import java.util.Stack;
 
  public static void factor1(AnalizadorLexico lexico) throws IOException  
 {
-   /* boolean fop= false;
-    String [] param = null;
-    
-    if(!atributo.isEmpty() &&(atributo.peek().getTipo().equalsIgnoreCase("funcion") || 
-            atributo.peek().getTipo().equalsIgnoreCase("procedimiento")))
-    {
-        
-        fop = true;
-        param =((String) atributo.peek().getParametros().get(posParametro.peek())).split("@");
-                
-    }*/
-
     switch(preanalisis) 
     {
 	case  "token_num":
-            //creo que el control de los paramatros de funciones y procedimientos
-      /*      if(fop)
-            {
-              //  System.out.println(param[1]);
-               if(!param[1].equalsIgnoreCase("integer"))
-                {
-                    System.out.println("ERROR SEMANTICO EN LA LINEA  "+linea[1]+" se espera un "+param[1]
-                            + " y se recibe un integer");
-                    System.exit(0);
-                }
-                int auxPos = posParametro.peek();
-                posParametro.pop();
-                posParametro.push(auxPos+1);
-            }*/
+            mepa.println("APCT "+linea[2]);
             match("token_num",lexico);
 	break;
 	case "id":
@@ -1487,6 +1467,7 @@ import java.util.Stack;
                     }
                 }
                 match("id",lexico);
+               
             } 
             else
             {

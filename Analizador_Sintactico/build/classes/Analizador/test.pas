@@ -27,7 +27,7 @@ begin
   r2:=true;
   r := 4;
 pro(fun(-10,false));
-fun:=fun(fun(fun(10,true),9=10),9<5);
+fun1:=fun(fun(fun(10,true),9=10),9<5);
 fun1:=fun(fun(fun(10-10+50*-9+25/4,8<9),true),false);
 
 end;

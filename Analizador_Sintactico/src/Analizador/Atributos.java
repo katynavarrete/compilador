@@ -19,13 +19,15 @@ public class Atributos
     private String tipo;
     private String tipoDato;
     private String tipoRetorno;
+    private String posMemoria= "";
     //ver si es necesario que la parametros tenga el nombre de los parametros
     private ArrayList parametros;
 
-    public Atributos(String elem) 
+    public Atributos(String elem, String posM) 
     {
         String [] arreglo = elem.split("#");
         this.nombre = arreglo[0];
+        posMemoria = posM;
         //System.out.println(elem);
         this.Alcance = arreglo[1];
         this.tipo = arreglo[2];
@@ -85,6 +87,11 @@ public class Atributos
     {
         return parametros;
     }
+    public String getPosMemoria()
+    {
+        // tiene el nivel y las pos en memoria
+        return posMemoria;
+    }
     public String getAtributos()
     {
       
@@ -106,6 +113,7 @@ public class Atributos
                 }
             }    
         } 
+        cad+=" "+ posMemoria;
         return cad;
     }
     public int getCantParametros()
