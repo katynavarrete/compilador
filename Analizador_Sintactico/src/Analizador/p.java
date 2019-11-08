@@ -23,7 +23,7 @@ public class p
         
        /* char c ='ñ';
         System.out.println(Character.BYTES);*/
-        File archivo = new File("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador"
+       /* File archivo = new File("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador"
                 + "\\Analizador_Sintactico\\src\\Analizador\\probando");
         RandomAccessFile fr = new  RandomAccessFile(archivo,"r");
         
@@ -33,8 +33,16 @@ public class p
             System.out.println((char)aux+" "+aux);
         }
         if(fr != null)
-            fr.close();
-                
+            fr.close();*/
+        
+        Stack pila = new Stack();
+        for (int i = 0; i < 10; i++) 
+        {
+            pila.push(i);
+        }
+        System.out.println( pila.toString());
+        System.out.println(pila.pop());
+        System.out.println( pila.toString());
       
     }
 }

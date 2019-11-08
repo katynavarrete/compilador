@@ -22,22 +22,20 @@ import java.util.Stack;
  */
  public class AnalizadorSintactico 
 {
-     public static String preanalisis;
-     public static String[] linea;
-     public static Tabla_de_Simbolos ts;
-     public static Stack<Atributos> atributo;
-     public static  PrintWriter mepa ;
-    
-    // public static Stack<Integer>  posParametro;
-   //  public static boolean puedeF=false;
-     
-     public  static void main(String args[]) throws IOException
+    public static String preanalisis;
+    public static String[] linea;
+    public static Tabla_de_Simbolos ts;
+    public static Stack<Atributos> atributo;
+    public static  PrintWriter mepa ;
+    public static Manejador_etiquetas manejadorEtiq;
+    public  static void main(String args[]) throws IOException
     {
        
       // if(args.length == 1)
        {
           
            ts = new Tabla_de_Simbolos();
+           manejadorEtiq = new Manejador_etiquetas();
           //  AnalizadorLexico lexico = new AnalizadorLexico(args[0]);
             atributo = new Stack();
 //            posParametro = new Stack();
@@ -168,7 +166,7 @@ import java.util.Stack;
                 
                 String alcance = "local en "+nombre;
                 match("id",lexico); 
-                mepa.println("ENPR 1");
+                mepa.println(manejadorEtiq.agregarFunPro(nombre)+" ENPR 1");
                //aca agregar un insertar en la TS
                 
                 //parametros de la funcion
@@ -285,6 +283,7 @@ import java.util.Stack;
                 alcance = "local en "+linea[2];
                 nombre = linea[2];
 		match("id",lexico); 
+                mepa.println(manejadorEtiq.agregarFunPro(nombre)+" ENPR 1");
                 String cadena ="";
                 boolean conParametros=false;
 		if(preanalisis.equalsIgnoreCase("parent_abre") ) 
@@ -767,19 +766,21 @@ import java.util.Stack;
     public static   void sent_condicional(AnalizadorLexico lexico) throws IOException 
     {
         
-        //System.out.println("SENT_CONDICIONAL");
+       
         if(preanalisis.equalsIgnoreCase("token_if"))
         {
             String tipoExp;
             match( "token_if",lexico);
             tipoExp = expresion(lexico);
-         //   System.out.println(tipoExp);
+         
             if(!tipoExp.equalsIgnoreCase("boolean"))
             {
                 System.out.println("ERROR SEMANTICO SE ESPERABA UNA EXPESION BOOLEANA PARA LA SENTENCIA IF EN LA LINEA "+linea[1]);
                 System.exit(0);
             }
-            match("token_then",lexico); 
+            match("token_then",lexico);
+            mepa.println("DSVF "+manejadorEtiq.generaEtiquetaCondicional());
+            
             sent_condicional1(lexico);
         }
         else
@@ -798,6 +799,11 @@ import java.util.Stack;
              preanalisis.equalsIgnoreCase("id") ) 
         {
             sentencia_simple(lexico);
+            if(preanalisis.equalsIgnoreCase("token_else") )
+            {
+               manejadorEtiq.generaEtiquetaCondicional();
+            }
+            mepa.println("DSVS "+manejadorEtiq.obtenerEtiquetaCondicional());
             sent_condicional2(lexico);
         }
         else
@@ -806,7 +812,11 @@ import java.util.Stack;
             {
                 
                 sentencia_compuesta(lexico);
-               
+                if(preanalisis.equalsIgnoreCase("token_else") )
+                {
+                   manejadorEtiq.generaEtiquetaCondicional();
+                }
+                mepa.println("DSVS "+manejadorEtiq.obtenerEtiquetaCondicional());
                 sent_condicional3(lexico);
             }
             else
@@ -830,6 +840,8 @@ import java.util.Stack;
 		case  "token_else" :
                         
 			match("token_else",lexico);
+                        mepa.println(manejadorEtiq.obtenerEtiquetaCondicional()+" NADA");
+                        
 			sent_condicional4(lexico);
 		break;
 		
@@ -845,7 +857,7 @@ import java.util.Stack;
 	      preanalisis.equalsIgnoreCase("id")) 
 	{
 		sentencia_simple(lexico);
-		sent_condicional5(lexico);
+		
 	}
 	else
 	{
@@ -866,12 +878,7 @@ import java.util.Stack;
 }
 
 
- public static   void sent_condicional5(AnalizadorLexico lexico) throws IOException
-{
-    //System.out.println("SENT_CONDICIONAL5");
-  /*  if(preanalisis.equalsIgnoreCase("punto_y_coma"))
-	match("punto_y_coma",lexico);*/
-}
+
 
 
  public static   void sent_condicional3(AnalizadorLexico lexico) throws IOException{
@@ -887,6 +894,8 @@ import java.util.Stack;
 	       if(preanalisis.equalsIgnoreCase("token_else"))
 	       {
 		match("token_else",lexico);
+                mepa.println(manejadorEtiq.obtenerEtiquetaCondicional()+" NADA");
+                manejadorEtiq.generaEtiquetaCondicional();
 		sent_condicional4(lexico);
 	       }
                else
