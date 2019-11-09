@@ -63,7 +63,7 @@ import java.util.Stack;
     }
     public static void inicio(AnalizadorLexico lexico) throws IOException
     {
-        
+        int cont_ini = 0;
         //System.out.println("INICIO");
         linea =  lexico.pedirToken().split("#");
         preanalisis = linea[0];
@@ -76,7 +76,7 @@ import java.util.Stack;
             mepa.println("INPP");
             match("punto_y_coma",lexico);
             if(preanalisis.equalsIgnoreCase("token_var"))   
-		def_variable(lexico,"global");
+		cont_ini=def_variable(lexico,"global");
             if(preanalisis.equalsIgnoreCase("token_function")  ||  preanalisis.equalsIgnoreCase("token_procedure"))
             {   
                 mepa.println("DSVS l1");
@@ -87,8 +87,12 @@ import java.util.Stack;
             {
                 subprograma(lexico,"global");
             }
+            mepa.println("l1     NADA");
             sentencia_compuesta(lexico);
             match("punto",lexico);
+            if(cont_ini > 0)
+                mepa.println("LMEM "+cont_ini);
+            mepa.println("PARA");
 	}
 	else
 	{
@@ -100,10 +104,11 @@ import java.util.Stack;
     }
     
     //una posibilidad para manejar el alcance es que se lo mande como parametro 
-     public static  void def_variable(AnalizadorLexico lexico,String alcance) throws IOException
+     public static  int def_variable(AnalizadorLexico lexico,String alcance) throws IOException
     {
         ArrayList aux = new ArrayList();
         String cad = "";
+        int cont = 0;
         //System.out.println("DEF_VARIABLE");
         if(preanalisis.equalsIgnoreCase("token_var"))
 	{
@@ -113,13 +118,14 @@ import java.util.Stack;
             {
                 aux.add(linea[2]);
 		match("id",lexico);
-                mepa.println("RMEM 1");
+                
+                cont++;
 		while (preanalisis.equalsIgnoreCase("coma"))
 		{
                     match("coma",lexico);
                     aux.add(linea[2]);
                     match("id",lexico);
-                    mepa.println("RMEM 1");
+                    cont++;
 		}
 		match("dos_puntos",lexico);
                 int pos = preanalisis.lastIndexOf('_');
@@ -143,7 +149,7 @@ import java.util.Stack;
 		tipo(lexico); 
                 match("punto_y_coma",lexico);
             }
-        
+            mepa.println("RMEM "+cont);
 	}
 	else
 	{
@@ -151,12 +157,14 @@ import java.util.Stack;
             System.out.println("Error sintactico en la linea "+linea[1]+"se espera VAR y se recibe "+linea[2]);
            System.exit(0);
 	}
+        return cont;
    }
-     public static  void subprograma(AnalizadorLexico lexico,String alcancePadre) throws IOException
+     public static void subprograma(AnalizadorLexico lexico,String alcancePadre) throws IOException
     {
         //System.out.println("SUBPROGRAMA");
         String nombre="";
         ArrayList parametros = new ArrayList();
+        int cont=0;
         
         switch(preanalisis) 
         {
@@ -256,7 +264,7 @@ import java.util.Stack;
                             
                 //aca ya se tiene la info para procedure
                 if( preanalisis.equalsIgnoreCase("token_var"))
-                    def_variable(lexico,alcance);
+                    cont=def_variable(lexico,alcance);
                 while ( preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure")) 
                 {
                     subprograma(lexico,alcance);
@@ -273,7 +281,10 @@ import java.util.Stack;
                 { 
                     sentencia_compuesta(lexico); 
                     match("punto_y_coma",lexico);
+                    
                 }
+                if(cont > 0)
+                        mepa.println("LMEM "+cont);
                 ts.eliminarTS();
                
             break;
@@ -390,7 +401,7 @@ import java.util.Stack;
                 tipo(lexico);
 		match("punto_y_coma",lexico);
 		if( preanalisis.equalsIgnoreCase("token_var"))
-                    def_variable(lexico,alcance);
+                    cont=def_variable(lexico,alcance);
                 while ( preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure")) 
                 {
                     subprograma(lexico,alcance);
@@ -408,10 +419,11 @@ import java.util.Stack;
                     sentencia_compuesta(lexico); 
                     
                     match("punto_y_coma",lexico);
-                   
-		}
                     
-                    ts.eliminarTS();
+		}
+                if(cont > 0)
+                        mepa.println("LMEM "+cont);    
+                ts.eliminarTS();
                     
 		break;
                 default: 
@@ -422,7 +434,8 @@ import java.util.Stack;
                    System.exit(0);
                 }    
 		break;
-	}	
+	}
+       
     }
 
     public static void match(String terminal, AnalizadorLexico lexico) throws IOException
@@ -506,17 +519,58 @@ import java.util.Stack;
             break;
             case "id":
                 Atributos aux = ts.verificarElem(linea[2]);
+                String nombre = aux.getNombre();
+                String tipo = aux.getTipo();
                 if(aux != null)
                 {   
-                    //System.out.println(atributo.toString());
                     atributo.push(aux);
-                 //   posParametro.push(0);
-                    //System.out.println("id "+linea[2]);
-                    
                     match("id",lexico);
-                    
+                    if(aux.getTipo().equalsIgnoreCase("variable"))
+                    {
+                        Atributos aux2 = ts.verificarElem(ts.alcanceActual());
+                        int despl = 0;
+                        if(aux2 != null &&(aux2.getTipo().equalsIgnoreCase("funcion")||
+                            aux2.getTipo().equalsIgnoreCase("procedimiento")))
+                        {
+                            int i =0;
+                            boolean seguir = true;
+                            ArrayList <String>  lista= aux2.getParametros();
+                            while(seguir && i < lista.size())
+                            {
+                                String[] parametro = lista.get(i).split("@");
+                               
+                                if(parametro.length > 0 && parametro[0].equalsIgnoreCase(aux.getNombre()))
+                                {
+                                    i++;
+                                    despl = -(aux2.getCantParametros()+3-i);
+                                    if(!preanalisis.equalsIgnoreCase("asignacion"))
+                                        mepa.println("APVL "+ts.getNivelActual()+" , "+despl);
+                                    seguir= false;
+                                }
+                                i++;
+                            
+                            }
+                            if(seguir)
+                            {
+                                if(!preanalisis.equalsIgnoreCase("asignacion"))
+                                    mepa.println("APVL "+aux.getPosMemoria());
+                                else
+                                    manejadorEtiq.setAsignacion(aux.getPosMemoria());
+                            }
+                            else
+                            {
+                                if(preanalisis.equalsIgnoreCase("asignacion"))
+                                {
+                                    manejadorEtiq.setAsignacion(ts.getNivelActual()+" , "+despl);
+                                }
+                            }
+                        }
+                    }    
                     sentencia_simple1(lexico);
-                    
+                    if(tipo.equalsIgnoreCase("procedimiento"))
+                    {
+                        mepa.println("LLPR "+manejadorEtiq.getEtiqueta(nombre));
+                    }
                 }
                 else
                 {
@@ -676,9 +730,11 @@ import java.util.Stack;
                     +atributo.peek().getTipoDato()+" UNA EXPRESION DE TIPO "+tipoExp);
                     System.exit(0);
                 }
-              //  puedeF=false;
+                
+                mepa.println("ALVL "+manejadorEtiq.getAsignacion());
+                manejadorEtiq.eliminarPosAsignacion();
                 atributo.pop();
-               // posParametro.pop();
+               
             break;
             default:
                 
@@ -779,7 +835,7 @@ import java.util.Stack;
                 System.exit(0);
             }
             match("token_then",lexico);
-            mepa.println("DSVF "+manejadorEtiq.generaEtiquetaCondicional());
+            mepa.println("DSVF "+manejadorEtiq.generaEtiquetaCondicionalPrim());
             
             sent_condicional1(lexico);
         }
@@ -801,9 +857,14 @@ import java.util.Stack;
             sentencia_simple(lexico);
             if(preanalisis.equalsIgnoreCase("token_else") )
             {
-               manejadorEtiq.generaEtiquetaCondicional();
+               mepa.println("DSVS "+manejadorEtiq.generaEtiquetaCondicionalSig());
             }
-            mepa.println("DSVS "+manejadorEtiq.obtenerEtiquetaCondicional());
+            else
+            {
+                mepa.println(manejadorEtiq.obtenerEtiquetaCondicionalPrim()+" NADA");
+                manejadorEtiq.eliminaEtiquetaCondicional();
+            }
+            //si no hay else capas que podria colocar la etiqueta de pri con nada 
             sent_condicional2(lexico);
         }
         else
@@ -814,9 +875,15 @@ import java.util.Stack;
                 sentencia_compuesta(lexico);
                 if(preanalisis.equalsIgnoreCase("token_else") )
                 {
-                   manejadorEtiq.generaEtiquetaCondicional();
+                    mepa.println("DSVS "+manejadorEtiq.generaEtiquetaCondicionalSig());
+                    
                 }
-                mepa.println("DSVS "+manejadorEtiq.obtenerEtiquetaCondicional());
+                else
+                {
+                    mepa.println(manejadorEtiq.obtenerEtiquetaCondicionalPrim()+" NADA");
+                    manejadorEtiq.eliminaEtiquetaCondicional();
+                }
+                
                 sent_condicional3(lexico);
             }
             else
@@ -840,9 +907,10 @@ import java.util.Stack;
 		case  "token_else" :
                         
 			match("token_else",lexico);
-                        mepa.println(manejadorEtiq.obtenerEtiquetaCondicional()+" NADA");
-                        
-			sent_condicional4(lexico);
+                        mepa.println(manejadorEtiq.obtenerEtiquetaCondicionalPrim()+" NADA");
+                        sent_condicional4(lexico);
+                        mepa.println(manejadorEtiq.obtenerEtiquetaCondicionalSig()+" NADA");
+                        manejadorEtiq.eliminaEtiquetaCondicional();
 		break;
 		
 	}
@@ -894,9 +962,11 @@ import java.util.Stack;
 	       if(preanalisis.equalsIgnoreCase("token_else"))
 	       {
 		match("token_else",lexico);
-                mepa.println(manejadorEtiq.obtenerEtiquetaCondicional()+" NADA");
-                manejadorEtiq.generaEtiquetaCondicional();
+                mepa.println(manejadorEtiq.obtenerEtiquetaCondicionalPrim()+" NADA");
+               
 		sent_condicional4(lexico);
+                mepa.println(manejadorEtiq.obtenerEtiquetaCondicionalSig()+" NADA");
+                manejadorEtiq.eliminaEtiquetaCondicional();
 	       }
                else
                {
@@ -914,14 +984,16 @@ import java.util.Stack;
  public static void sent_repetitiva(AnalizadorLexico lexico) throws IOException 
  {
     // System.out.println("SENT_REPETITIVA");
-       if(preanalisis.equalsIgnoreCase("token_while"))
-       {
+    if(preanalisis.equalsIgnoreCase("token_while"))
+    {
+        mepa.println(manejadorEtiq.generaEtiquetaCondicionalWhile()+" NADA");
 	match("token_while",lexico);
 	String tipoExp = expresion(lexico);
         if(!tipoExp.equalsIgnoreCase("boolean"))
         {
             System.out.println("ERROR SEMANTICO SE ESPERABA UNA EXPRESION DE TIPO BOOLEAN PARA LA SENTENCIA WHILE EN LA LINEA "+linea[1]);
         }
+        mepa.println("DSVF "+manejadorEtiq.obtenerEtiquetaCondicionalSig());
 	match("token_do",lexico);
 	if ( preanalisis.equalsIgnoreCase("token_if")  ||  preanalisis.equalsIgnoreCase("token_read")  || 
 	      preanalisis.equalsIgnoreCase("token_write")  ||  preanalisis.equalsIgnoreCase("token_while") ||
@@ -930,12 +1002,16 @@ import java.util.Stack;
 		sentencia_simple(lexico);
 		if (preanalisis.equalsIgnoreCase("punto_y_coma")) 
 			match("punto_y_coma",lexico);
+                mepa.println("DSVS "+manejadorEtiq.obtenerEtiquetaCondicionalPrim());
 	}
 	else
 	{	
 		sentencia_compuesta(lexico);
 		 match("punto_y_coma",lexico); 
+                 mepa.println("DSVS "+manejadorEtiq.obtenerEtiquetaCondicionalPrim());
 	}
+        mepa.println(manejadorEtiq.obtenerEtiquetaCondicionalSig()+" NADA");
+        manejadorEtiq.eliminaEtiquetaCondicional();
         }
        else
        {
@@ -964,6 +1040,7 @@ import java.util.Stack;
                 }
 		expresion(lexico);
 		match("parent_cierra",lexico);
+                mepa.println("IMLN");
 	}
 	else
 	{
@@ -992,6 +1069,7 @@ import java.util.Stack;
                         System.exit(0);
                     }
                    match("parent_cierra",lexico);
+                   mepa.println("LELN");
 	       }
                else
                {
@@ -1042,6 +1120,7 @@ import java.util.Stack;
 	{
             match("token_or",lexico); 
             aux = exp1(lexico); 
+            mepa.println("DISJ");
             aux2 = expresion1(lexico);
             if(!aux2.equalsIgnoreCase("") && !aux.equalsIgnoreCase("boolean"))
             {
@@ -1049,6 +1128,7 @@ import java.util.Stack;
                             +linea[1]);
                     System.exit(0);
             }
+             
 	}
         return aux;
 }
@@ -1087,7 +1167,7 @@ import java.util.Stack;
         String aux = "";
 	if (preanalisis.equalsIgnoreCase("token_and")) 
 	{
-		match( "token_and",lexico);
+		match("token_and",lexico);
 		aux = exp2(lexico); 
                 if(!aux.equalsIgnoreCase("boolean"))
                 {
@@ -1095,7 +1175,9 @@ import java.util.Stack;
                             +linea[1]);
                     System.exit(0);
                 }
+                 mepa.println("CONJ");
 		exp11 (lexico);
+                
 	}
 	return aux;
 }
@@ -1114,6 +1196,7 @@ import java.util.Stack;
                     System.out.println("ERROR SEMANTICO SE ESPERABA UN BOOLEAN PARA LA OPERACION NOT Y SE RECIBE "+aux+" en la linea "+linea[1]);
                     System.exit(0);
                 }
+                 mepa.println("NEGA");
                 
 	}
 	else 
@@ -1165,6 +1248,7 @@ import java.util.Stack;
  public static String  exp31 (AnalizadorLexico lexico, String aux1) throws IOException  
  {
     String aux = "", aux2;
+    int opLogico = -1;
     boolean soloEnt = true;
     if (preanalisis.equalsIgnoreCase("token_mayor")  ||  preanalisis.equalsIgnoreCase("token_menor") ||  
         preanalisis.equalsIgnoreCase("token_igual") ||  preanalisis.equalsIgnoreCase("token_mayorI") ||
@@ -1173,22 +1257,38 @@ import java.util.Stack;
        
            
         if (preanalisis.equalsIgnoreCase("token_menor"))
+        {
             match("token_menor",lexico);
+            opLogico=0;
+        }    
         if (preanalisis.equalsIgnoreCase("token_igual"))
         {
             match("token_igual",lexico);
             soloEnt = false;
+            opLogico=1;
         }    
         if (preanalisis.equalsIgnoreCase("token_mayor"))
+        {
             match("token_mayor",lexico);
+            opLogico=2;
+        }    
         if(preanalisis.equalsIgnoreCase("token_menorI"))
+        {
             match("token_menorI",lexico);
+            opLogico=3;
+        }
         if(preanalisis.equalsIgnoreCase("token_mayorI"))
+        {
             match("token_mayorI",lexico);
+            opLogico=4;
+        }    
         if(preanalisis.equalsIgnoreCase("token_distinto"))
+        {
             match("token_distinto",lexico);
- 
+            opLogico=5;
+        }
         aux = exp4(lexico);
+        mepa.println(manejadorEtiq.operadorLogico(opLogico));
         if(!aux.equalsIgnoreCase(aux1))
         {
             System.out.println("ERROR SEMANTICO SE COMPARAN DATOS DE DISTINTO TIPO EN LA LINEA "+linea[1]);
@@ -1254,7 +1354,9 @@ import java.util.Stack;
                 System.out.println("ERROR SEMANTICO se esperaba un entero para realizar una suma en la linea "+linea[1]);
                 System.exit(0);
             }
+            mepa.println("SUMA");
             exp41(lexico); 
+            
 	}
 	else
 	{
@@ -1268,7 +1370,9 @@ import java.util.Stack;
                     System.out.println("ERROR SEMANTICO se esperaba un entero para realizar una resta en la linea "+linea[1]);
                     System.exit(0);
                 }
+                mepa.println("SUST");
 		exp41(lexico);
+                
             }
 	}
     return retorno;
@@ -1324,7 +1428,9 @@ import java.util.Stack;
             System.exit(0);
         }
         retorno = "multiplicacion";
+        mepa.println("MULT");
 	termino1(lexico); 
+        
     }    
     else
     {
@@ -1338,7 +1444,9 @@ import java.util.Stack;
                 System.exit(0);
             }
             retorno = "division";
+             mepa.println("DIVI");
             termino1(lexico);
+            
 	}
     }
     return retorno;
@@ -1373,11 +1481,11 @@ import java.util.Stack;
             Atributos aux = (ts.verificarElem(linea[2]));
             if(aux != null)
             {   
-          
+                int despl = 0;
                 match("id",lexico);
                 if(aux.getTipo().equalsIgnoreCase("funcion"))
                 {
-                    
+                    mepa.println("LLPR "+manejadorEtiq.getEtiqueta(atributo.peek().getNombre()));
                     atributo.push(aux);
                    // posParametro.push(0);
                    if(!preanalisis.equalsIgnoreCase("parent_abre") && atributo.peek().getCantParametros()!=0)
@@ -1401,10 +1509,52 @@ import java.util.Stack;
                     {
                         if(aux.getTipo().equalsIgnoreCase("variable"))
                         {
+                            
                             tipoExp = aux.getTipoDato();
-                            mepa.println("APVL "+aux.getPosMemoria());
+                            Atributos aux2 = ts.verificarElem(ts.alcanceActual());
+                        if(aux2 != null &&(aux2.getTipo().equalsIgnoreCase("funcion")||
+                            aux2.getTipo().equalsIgnoreCase("procedimiento")))
+                        {
+                            int i =0;
+                            boolean seguir = true;
+                            ArrayList <String>  lista= aux2.getParametros();
+                            while(seguir && i < lista.size())
+                            {
+                                String[] parametro = lista.get(i).split("@");
+                                
+                                if(parametro.length > 0 && parametro[0].equalsIgnoreCase(aux.getNombre()))
+                                {
+                                    i++;
+                                    despl = -(aux2.getCantParametros()+3-i);
+                                    if(!preanalisis.equalsIgnoreCase("asignacion"))
+                                        mepa.println("APVL "+ts.getNivelActual()+" , "+despl);
+                                    
+                                    seguir= false;
+                                }
+                                i++;
+                            
+                            }
+                            if(seguir)
+                            {
+                                if(!preanalisis.equalsIgnoreCase("asignacion"))
+                                    mepa.println("APVL "+aux.getPosMemoria());
+                                else
+                                    manejadorEtiq.setAsignacion(aux.getPosMemoria());
+                            }
+                            else
+                            {
+                                if(preanalisis.equalsIgnoreCase("asignacion"))
+                                {
+                                    manejadorEtiq.setAsignacion(ts.getNivelActual()+" , "+despl);
+                                }
+                            }
                             
                         }
+                            
+                            
+                            
+                        }
+                        
                     }
                 }
                 else

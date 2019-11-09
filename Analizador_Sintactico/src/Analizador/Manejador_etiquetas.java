@@ -16,13 +16,13 @@ public class Manejador_etiquetas
 {
     private HashMap<String,String> etiquetaProYFun;
     private int indice = 2;
-    private Stack<String> pila;
-    
+    private Stack<String[]> pila;
+    private String posAsignacion;
     public Manejador_etiquetas()
     {
         this.etiquetaProYFun = new HashMap();
         this.pila = new Stack();
-        
+        posAsignacion = "";
     }
     public String agregarFunPro(String nombre)
     {
@@ -31,20 +31,90 @@ public class Manejador_etiquetas
         indice++;
         return aux;
     }
+    public String getAsignacion()
+    {
+        return posAsignacion;
+    }
+    public void setAsignacion(String pos)
+    {
+        this.posAsignacion = pos;
+    }
+    public void eliminarPosAsignacion()
+    {
+        this.posAsignacion = "";
+    }
     public String getEtiqueta(String nombre)
     {
         return (this.etiquetaProYFun.get(nombre.toLowerCase()));
     }
-    public String generaEtiquetaCondicional()
+    public String generaEtiquetaCondicionalPrim()
     {
-        String aux= "l"+indice;
+        String [] aux= new String[2];
+        aux[0]= "l"+indice;
+        aux[1]= "nulo";
         pila.push(aux);
         indice++;
-        return aux;
+        return aux[0];
     }
-    public String obtenerEtiquetaCondicional()
+    public String generaEtiquetaCondicionalSig()
     {
-       return pila.pop();
+        String etiqAux ="l"+ indice;
+        pila.peek()[1]=etiqAux;
+        indice++;
+        return etiqAux;
+    }
+    public String generaEtiquetaCondicionalWhile()
+    {
+        String [] aux= new String[2];
+        aux[0]= "l"+indice;
+        aux[1]= "l"+(indice+1);
+        pila.push(aux);
+        indice+=2;
+        return aux[0];
+    }
+    
+    
+    public String obtenerEtiquetaCondicionalPrim()
+    {
+       return ((pila.peek())[0]);
+    }
+    public String obtenerEtiquetaCondicionalSig()
+    {
+       return ((pila.peek())[1]);
+    }
+    public void eliminaEtiquetaCondicional()
+    {
+        if(!pila.isEmpty())
+        {
+            pila.pop();
+        }
+    }
+    public String operadorLogico(int op)
+    {
+        String opLogico="";
+        switch(op)
+        {
+            case 0:
+                opLogico="CMME";
+            break;
+            case 1:
+                opLogico="CMIG";
+            break;
+            case 2:
+                opLogico="CMMA";
+            break;
+            case 3:
+                opLogico="CMNI";
+            break;
+            case 4:
+                opLogico="CMYI";
+            break;
+            case 5:
+                opLogico="CMDG";
+            break;
+                        
+        }
+        return opLogico;
     }
     
 }

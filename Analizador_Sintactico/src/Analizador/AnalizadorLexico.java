@@ -295,8 +295,8 @@ public class AnalizadorLexico
         palabrasReservadas.put("else","token_else#" );
         palabrasReservadas.put("while","token_while#" );
         palabrasReservadas.put("do","token_do#" );
-        palabrasReservadas.put("read","token_read#");
-        palabrasReservadas.put("write","token_write#" );
+        palabrasReservadas.put("readln","token_read#");
+        palabrasReservadas.put("writeln","token_write#" );
         palabrasReservadas.put("boolean","token_boolean#");
         palabrasReservadas.put("integer","token_integer#");
         palabrasReservadas.put("true","token_true#");

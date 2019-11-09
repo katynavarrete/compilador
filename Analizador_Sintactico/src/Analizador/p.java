@@ -20,29 +20,25 @@ public class p
 {
     public static void main(String[] args) throws FileNotFoundException, IOException 
     {
-        
-       /* char c ='ñ';
-        System.out.println(Character.BYTES);*/
-       /* File archivo = new File("C:\\Users\\PC\\Desktop\\laboratorio comp e int\\tp1\\sintactico\\compilador"
-                + "\\Analizador_Sintactico\\src\\Analizador\\probando");
-        RandomAccessFile fr = new  RandomAccessFile(archivo,"r");
-        
-        for (int i = 0; i < fr.length(); i++) 
+       int indice = 1;
+       Stack <int []> pila  = new Stack();
+       String [] cond = {"if","if","if","else","else","else"};
+        for (int i = 0; i < cond.length; i++)
         {
-            int aux = fr.read();
-            System.out.println((char)aux+" "+aux);
+            if(cond[i].equalsIgnoreCase("if"))
+            {
+                int [] aux = new int[2];
+                aux[0]=indice;
+                aux[1]=indice+1;
+                pila.push(aux);
+                indice+=2;
+            }
+            else
+            {
+              
+                
+            }
         }
-        if(fr != null)
-            fr.close();*/
-        
-        Stack pila = new Stack();
-        for (int i = 0; i < 10; i++) 
-        {
-            pila.push(i);
-        }
-        System.out.println( pila.toString());
-        System.out.println(pila.pop());
-        System.out.println( pila.toString());
-      
+       
     }
 }

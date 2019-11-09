@@ -82,5 +82,9 @@ public class Tabla_de_Simbolos
         }
                 
     }
+    public int getNivelActual()
+    {
+        return pila.peek().getNivel();
+    }
     
 }

@@ -57,11 +57,17 @@ public class Ts_auxiliar
         
         String [] arreglo = elem .split("#");
         String nombre = arreglo[0].toLowerCase();
+        String aux=""+nivel;
         
         if(!diccionario.containsKey(nombre.toLowerCase()))
         {
-            Atributos atributo = new Atributos(elem, (nivel+","+pos));
-            pos++;
+            if(arreglo[2].equalsIgnoreCase("variable"))
+            {
+                aux+= ","+pos;
+                pos++;
+            }
+            Atributos atributo = new Atributos(elem, (aux));
+           
             diccionario.put(nombre, atributo);
           //  this.imprimir();
         }
@@ -74,6 +80,7 @@ public class Ts_auxiliar
         }
      return exito;
     }
+    
     public void imprimir()
     {
       
