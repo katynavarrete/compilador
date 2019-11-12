@@ -17,12 +17,12 @@ public class Manejador_etiquetas
     private HashMap<String,String> etiquetaProYFun;
     private int indice = 2;
     private Stack<String[]> pila;
-    private String posAsignacion;
+    private Stack <String> posAsignacion;
     public Manejador_etiquetas()
     {
         this.etiquetaProYFun = new HashMap();
         this.pila = new Stack();
-        posAsignacion = "";
+        posAsignacion = new Stack();
     }
     public String agregarFunPro(String nombre)
     {
@@ -32,16 +32,20 @@ public class Manejador_etiquetas
         return aux;
     }
     public String getAsignacion()
-    {
-        return posAsignacion;
+    { 
+        String asi="";
+        if(!posAsignacion.isEmpty())
+            asi=posAsignacion.peek();
+        return asi;
     }
     public void setAsignacion(String pos)
     {
-        this.posAsignacion = pos;
+        this.posAsignacion.push(pos);
     }
     public void eliminarPosAsignacion()
     {
-        this.posAsignacion = "";
+        if(!posAsignacion.isEmpty())
+            this.posAsignacion.pop();
     }
     public String getEtiqueta(String nombre)
     {

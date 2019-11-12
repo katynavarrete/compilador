@@ -1,19 +1,18 @@
-Program ejemplo ;
-var k:integer;
-procedure p (n:integer; g:integer);
-var i,h:integer;
-    a:boolean;
+Program ejemplo;
+var m: integer;
+function f(n:integer; k:integer) : integer;
+var p,q:integer;
 begin
-if n<2 then h:=g+n
+if n<2
+then begin f:=n; p:=0 end
 else begin
-h:=g;
-p(n-1,h);
-k:=h;
-p(n-2,g)
+f:= f(n-1,p)+f(n-2,q);
+p:= p+q+1
 end;
 writeln(n);
-writeln(g);
+writeln(k)
 end;
 begin
-k:=0; p(3,k)
+writeln(f(3,m));
+writeln(m)
 end.

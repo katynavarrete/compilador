@@ -165,6 +165,7 @@ import java.util.Stack;
         String nombre="";
         ArrayList parametros = new ArrayList();
         int cont=0;
+        int cantParametros = 0;
         
         switch(preanalisis) 
         {
@@ -228,24 +229,26 @@ import java.util.Stack;
                             
                             tipo(lexico);
                         }
+                        
                         if(!ts.insertarElem(nombre+"#"+alcancePadre+"#procedimiento#"+cadena))
                         {
                             System.out.println(" en la linea "+linea[1]);
                             System.exit(0);
                         }
                         ts.insertarTS(nombre);
-                        
+                        int desplazamiento = 0;
                         String [] parAux = cadena.split("&");
+                        
+                        cantParametros = parAux.length;
                         for (int j = 0; j < parAux.length; j++) 
                         {
                            
-                          //  System.out.println(parAux[j]);
+                            desplazamiento = -(parAux.length+3-(j+1));
                             int pos1 = parAux[j].lastIndexOf("@");
-                           
                             String nomV = parAux[j].substring(0, pos1);
                             String tipoDato = parAux[j].substring(pos1+1);
-                          //  System.out.println("nom "+nomV+"    "+tipoDato);
-                            if(!ts.insertarElem(nomV+"#"+alcance+"#variable#"+tipoDato))
+                            
+                            if(!ts.insertarElem(nomV+"#"+alcance+"#variable#"+tipoDato+"#"+desplazamiento))
                             {
                                 System.exit(0);
                             }
@@ -285,6 +288,7 @@ import java.util.Stack;
                 }
                 if(cont > 0)
                         mepa.println("LMEM "+cont);
+                mepa.println("RTPR "+ts.getNivelActual()+" "+cantParametros);
                 ts.eliminarTS();
                
             break;
@@ -378,10 +382,11 @@ import java.util.Stack;
                 }
                     
                 ts.insertarTS(nombre);
-                
+                int desplazamiento=0;
                 String [] parAux = cadena.split("&");
                 if(!parAux[0].equalsIgnoreCase(""))
                 {
+                    cantParametros = parAux.length;
                     for (int j = 0; j < parAux.length; j++) 
                     {
                  
@@ -389,12 +394,14 @@ import java.util.Stack;
                         
                         String nomV = parAux[j].substring(0, pos1);
                         String tipoDato = parAux[j].substring(pos1+1);
+                        desplazamiento = -(parAux.length+3-(j+1));
                     //  System.out.println("nom "+nomV+"    "+tipoDato);
-                        if(!ts.insertarElem(nomV+"#"+alcance+"#variable#"+tipoDato))
+                        if(!ts.insertarElem(nomV+"#"+alcance+"#variable#"+tipoDato+"#"+desplazamiento))
                         {
                            
                             System.exit(0);
                         }
+                        ts.insertarElem(nombre+"#"+alcance+"#variable#"+nomTipo+"#"+(-(cantParametros+3)));
                     }
                 }    
                // ts.imprimir();
@@ -423,6 +430,9 @@ import java.util.Stack;
 		}
                 if(cont > 0)
                         mepa.println("LMEM "+cont);    
+                
+                mepa.println("RTPR "+ts.getNivelActual()+" "+cantParametros);
+                
                 ts.eliminarTS();
                     
 		break;
@@ -519,52 +529,37 @@ import java.util.Stack;
             break;
             case "id":
                 Atributos aux = ts.verificarElem(linea[2]);
-                String nombre = aux.getNombre();
-                String tipo = aux.getTipo();
-                if(aux != null)
+                
+                 if(aux != null)
                 {   
+                    String nombre = aux.getNombre();
+                    String tipo = aux.getTipo();
+               
                     atributo.push(aux);
                     match("id",lexico);
-                    if(aux.getTipo().equalsIgnoreCase("variable"))
+                    if(aux.getTipo().equalsIgnoreCase("variable") || 
+                            (aux.getTipo().equalsIgnoreCase("funcion")))
                     {
-                        Atributos aux2 = ts.verificarElem(ts.alcanceActual());
-                        int despl = 0;
-                        if(aux2 != null &&(aux2.getTipo().equalsIgnoreCase("funcion")||
-                            aux2.getTipo().equalsIgnoreCase("procedimiento")))
+                        if(aux.getTipo().equalsIgnoreCase("funcion"))
                         {
-                            int i =0;
-                            boolean seguir = true;
-                            ArrayList <String>  lista= aux2.getParametros();
-                            while(seguir && i < lista.size())
-                            {
-                                String[] parametro = lista.get(i).split("@");
-                               
-                                if(parametro.length > 0 && parametro[0].equalsIgnoreCase(aux.getNombre()))
-                                {
-                                    i++;
-                                    despl = -(aux2.getCantParametros()+3-i);
-                                    if(!preanalisis.equalsIgnoreCase("asignacion"))
-                                        mepa.println("APVL "+ts.getNivelActual()+" , "+despl);
-                                    seguir= false;
-                                }
-                                i++;
                             
-                            }
-                            if(seguir)
+                            aux = ts.verificarElemFun(aux.getNombre());
+                            
+                        }
+                        if(aux!=null)
+                        {
+                       
+                            
+                            if(preanalisis.equalsIgnoreCase("asignacion") )
                             {
-                                if(!preanalisis.equalsIgnoreCase("asignacion"))
-                                    mepa.println("APVL "+aux.getPosMemoria());
-                                else
-                                    manejadorEtiq.setAsignacion(aux.getPosMemoria());
+                                manejadorEtiq.setAsignacion(aux.getPosMemoria());
+                     
                             }
                             else
                             {
-                                if(preanalisis.equalsIgnoreCase("asignacion"))
-                                {
-                                    manejadorEtiq.setAsignacion(ts.getNivelActual()+" , "+despl);
-                                }
+                                mepa.println("APVL "+aux.getPosMemoria());
                             }
-                        }
+                        }    
                     }    
                     sentencia_simple1(lexico);
                     if(tipo.equalsIgnoreCase("procedimiento"))
@@ -732,6 +727,7 @@ import java.util.Stack;
                 }
                 
                 mepa.println("ALVL "+manejadorEtiq.getAsignacion());
+               // System.out.println("elimino asinacion "+manejadorEtiq.getAsignacion());
                 manejadorEtiq.eliminarPosAsignacion();
                 atributo.pop();
                
@@ -1483,9 +1479,9 @@ import java.util.Stack;
             {   
                 int despl = 0;
                 match("id",lexico);
-                if(aux.getTipo().equalsIgnoreCase("funcion"))
+                if(aux.getTipo().equalsIgnoreCase("funcion") )
                 {
-                    mepa.println("LLPR "+manejadorEtiq.getEtiqueta(atributo.peek().getNombre()));
+                    mepa.println("RMEM "+1);
                     atributo.push(aux);
                    // posParametro.push(0);
                    if(!preanalisis.equalsIgnoreCase("parent_abre") && atributo.peek().getCantParametros()!=0)
@@ -1503,6 +1499,7 @@ import java.util.Stack;
                     factor2(lexico);
                     if(aux.getTipo().equalsIgnoreCase("funcion"))
                     {
+                        mepa.println("LLPR "+manejadorEtiq.getEtiqueta(aux.getNombre()));
                         tipoExp = aux.getTipoRetorno();
                     }    
                     else
@@ -1511,49 +1508,18 @@ import java.util.Stack;
                         {
                             
                             tipoExp = aux.getTipoDato();
-                            Atributos aux2 = ts.verificarElem(ts.alcanceActual());
-                        if(aux2 != null &&(aux2.getTipo().equalsIgnoreCase("funcion")||
-                            aux2.getTipo().equalsIgnoreCase("procedimiento")))
-                        {
-                            int i =0;
-                            boolean seguir = true;
-                            ArrayList <String>  lista= aux2.getParametros();
-                            while(seguir && i < lista.size())
+                      
+                            if(preanalisis.equalsIgnoreCase("asignacion"))
                             {
-                                String[] parametro = lista.get(i).split("@");
-                                
-                                if(parametro.length > 0 && parametro[0].equalsIgnoreCase(aux.getNombre()))
-                                {
-                                    i++;
-                                    despl = -(aux2.getCantParametros()+3-i);
-                                    if(!preanalisis.equalsIgnoreCase("asignacion"))
-                                        mepa.println("APVL "+ts.getNivelActual()+" , "+despl);
-                                    
-                                    seguir= false;
-                                }
-                                i++;
-                            
-                            }
-                            if(seguir)
-                            {
-                                if(!preanalisis.equalsIgnoreCase("asignacion"))
-                                    mepa.println("APVL "+aux.getPosMemoria());
-                                else
-                                    manejadorEtiq.setAsignacion(aux.getPosMemoria());
+                                manejadorEtiq.setAsignacion(aux.getPosMemoria());
                             }
                             else
                             {
-                                if(preanalisis.equalsIgnoreCase("asignacion"))
-                                {
-                                    manejadorEtiq.setAsignacion(ts.getNivelActual()+" , "+despl);
-                                }
+                                mepa.println("APVL "+aux.getPosMemoria());
                             }
-                            
+                                               
                         }
-                            
-                            
-                            
-                        }
+                        
                         
                     }
                 }
@@ -1752,7 +1718,7 @@ public static void factor2(AnalizadorLexico lexico) throws IOException
         }
         else
         {
-            if(atributo.peek().getTipo().equalsIgnoreCase("variable"))
+            if(atributo.peek().getTipo().equalsIgnoreCase("variable") && atributo.peek().getNombre().equalsIgnoreCase(atributo.peek().getAlcance()))
             {
                 System.out.println("ERROR SEMANTICO QUIERE USAR LA VARIABLE "+ atributo.peek().getNombre()+
                         " COMO UNA FUNCION O PROCEDIMIENTO EN LA LINEA "+linea[1]);

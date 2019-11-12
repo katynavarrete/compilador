@@ -31,24 +31,44 @@ public class Tabla_de_Simbolos
         while(i >= 0 && atributo == null )
         {
           aux= pila.get(i);
+            if(aux.verificarElem(elem.toLowerCase()) && !aux.getAlcance().equalsIgnoreCase(elem))
+            {
+                atributo = (Atributos)aux.getAtributos(elem);
+            }
+            i--;
+        }
+        
+        return atributo;
+    }
+    public Atributos verificarElemFun(String elem)
+    {
+        Atributos atributo = null;
+        Ts_auxiliar aux;
+        int i = pila.size()-1;
+        while(i >= 0 && atributo == null )
+        {
+          aux= pila.get(i);
             if(aux.verificarElem(elem.toLowerCase()))
             {
                 atributo = (Atributos)aux.getAtributos(elem);
             }
             i--;
         }
+        
         return atributo;
     }
+    
     public boolean insertarElem(String elem)
     {
        boolean exito;
         if(pila.empty())
         {
-            pila.push(new Ts_auxiliar("global",nivel));
+            pila.push(new Ts_auxiliar("global",0));
             
         }
         Ts_auxiliar aux = pila.peek();
         exito = aux.insertarElem(elem);
+       
        
         return exito;
     }

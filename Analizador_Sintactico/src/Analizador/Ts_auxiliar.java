@@ -58,14 +58,24 @@ public class Ts_auxiliar
         String [] arreglo = elem .split("#");
         String nombre = arreglo[0].toLowerCase();
         String aux=""+nivel;
-        
-        if(!diccionario.containsKey(nombre.toLowerCase()))
+                
+        if(!diccionario.containsKey(nombre.toLowerCase()) || nombre.equalsIgnoreCase(alcance))
         {
-            if(arreglo[2].equalsIgnoreCase("variable"))
+            
+            if(arreglo[2].equalsIgnoreCase("variable") )
             {
-                aux+= ","+pos;
-                pos++;
+                if( arreglo.length == 5)
+                {
+                    aux+=","+arreglo[4];
+                }
+                else
+                {
+                    aux+= ","+pos;
+                    pos++;
+                    
+                }
             }
+            
             Atributos atributo = new Atributos(elem, (aux));
            
             diccionario.put(nombre, atributo);
@@ -74,7 +84,7 @@ public class Ts_auxiliar
         else
         {
             exito=false;
-            System.out.print("ERROR SEMANTICO: SE QUIERE DECLARAR "+nombre+ " LA CUAL ESTA DECLARADA"  );
+            System.out.print("ERROR SEMANTICO: SE QUIERE DECLARAR "+nombre+ " LA CUAL ESTA DECLARADA "  );
                 
             
         }
