@@ -60,6 +60,10 @@ public class Manejador_etiquetas
         indice++;
         return aux[0];
     }
+    public void imprimirEtiq()
+    {
+        etiquetaProYFun.forEach((k,v)-> System.out.println(k+"  "+v));
+    }
     public String generaEtiquetaCondicionalSig()
     {
         String etiqAux ="l"+ indice;
@@ -76,7 +80,12 @@ public class Manejador_etiquetas
         indice+=2;
         return aux[0];
     }
-    
+    public String etiquetaBegin()
+    {
+        String cad = "l"+indice;
+        indice++;
+        return cad;
+    }
     
     public String obtenerEtiquetaCondicionalPrim()
     {

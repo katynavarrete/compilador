@@ -48,7 +48,7 @@ import java.util.Stack;
                         + "Analizador_Sintactico\\src\\Analizador\\int.mepa");
         mepa = new PrintWriter(fichero);
         inicio(lexico);
-            
+      
         lexico.cerrarArchivo();
         if(fichero != null)
             fichero.close();
@@ -85,7 +85,7 @@ import java.util.Stack;
             
             while ( preanalisis.equalsIgnoreCase("token_function")  ||  preanalisis.equalsIgnoreCase("token_procedure"))
             {
-                subprograma(lexico,"global");
+                subprograma(lexico,"global",1);
             }
             mepa.println("l1     NADA");
             sentencia_compuesta(lexico);
@@ -159,7 +159,7 @@ import java.util.Stack;
 	}
         return cont;
    }
-     public static void subprograma(AnalizadorLexico lexico,String alcancePadre) throws IOException
+     public static void subprograma(AnalizadorLexico lexico,String alcancePadre, int nivel) throws IOException
     {
         //System.out.println("SUBPROGRAMA");
         String nombre="";
@@ -175,7 +175,7 @@ import java.util.Stack;
                 
                 String alcance = "local en "+nombre;
                 match("id",lexico); 
-                mepa.println(manejadorEtiq.agregarFunPro(nombre)+" ENPR 1");
+                mepa.println(manejadorEtiq.agregarFunPro(nombre)+" ENPR "+nivel);
                //aca agregar un insertar en la TS
                 
                 //parametros de la funcion
@@ -268,10 +268,22 @@ import java.util.Stack;
                 //aca ya se tiene la info para procedure
                 if( preanalisis.equalsIgnoreCase("token_var"))
                     cont=def_variable(lexico,alcance);
+                 String etiqueta = "";
+                if(preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure"))
+                {
+                    etiqueta = manejadorEtiq.etiquetaBegin();
+                    mepa.println("DSVS "+etiqueta);
+                }
                 while ( preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure")) 
                 {
-                    subprograma(lexico,alcance);
+                    
+                    subprograma(lexico,alcance,(nivel+1));
                 }
+                if(!etiqueta.equalsIgnoreCase(""))
+                {
+                    mepa.println(etiqueta+" NADA");
+                }
+                    
                 if(preanalisis.equalsIgnoreCase("token_if") || preanalisis.equalsIgnoreCase("token_read") || 
                     preanalisis.equalsIgnoreCase("token_write") || preanalisis.equalsIgnoreCase("token_while")  || 
 		    preanalisis.equalsIgnoreCase("id")) 
@@ -298,7 +310,7 @@ import java.util.Stack;
                 alcance = "local en "+linea[2];
                 nombre = linea[2];
 		match("id",lexico); 
-                mepa.println(manejadorEtiq.agregarFunPro(nombre)+" ENPR 1");
+                mepa.println(manejadorEtiq.agregarFunPro(nombre)+" ENPR "+nivel);
                 String cadena ="";
                 boolean conParametros=false;
 		if(preanalisis.equalsIgnoreCase("parent_abre") ) 
@@ -401,17 +413,32 @@ import java.util.Stack;
                            
                             System.exit(0);
                         }
+                        //System.out.println(-(cantParametros+3));
                         ts.insertarElem(nombre+"#"+alcance+"#variable#"+nomTipo+"#"+(-(cantParametros+3)));
                     }
-                }    
+                }
+                else
+                {
+                    ts.insertarElem(nombre+"#"+alcance+"#variable#"+nomTipo+"#"+(-(cantParametros+3)));
+                }
                // ts.imprimir();
                 tipo(lexico);
 		match("punto_y_coma",lexico);
 		if( preanalisis.equalsIgnoreCase("token_var"))
                     cont=def_variable(lexico,alcance);
+                 etiqueta = "";
+                if(preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure"))
+                {
+                    etiqueta = manejadorEtiq.etiquetaBegin();
+                    mepa.println("DSVS "+etiqueta);
+                }
                 while ( preanalisis.equalsIgnoreCase("token_function") || preanalisis.equalsIgnoreCase("token_procedure")) 
                 {
-                    subprograma(lexico,alcance);
+                    subprograma(lexico,alcance,(nivel+1));
+                }
+                if(!etiqueta.equalsIgnoreCase(""))
+                {
+                    mepa.println(etiqueta+" NADA");
                 }
                 if(preanalisis.equalsIgnoreCase("token_if") || preanalisis.equalsIgnoreCase("token_read") || 
 		   preanalisis.equalsIgnoreCase("token_write") || preanalisis.equalsIgnoreCase("token_while")
@@ -544,7 +571,6 @@ import java.util.Stack;
                         {
                             
                             aux = ts.verificarElemFun(aux.getNombre());
-                            
                         }
                         if(aux!=null)
                         {
@@ -711,19 +737,34 @@ import java.util.Stack;
 		match("asignacion",lexico); 
               //  puedeF = true;
 		String tipoExp = expresion(lexico);
-                if(atributo.peek().getTipo().equalsIgnoreCase("variable")&&
+                if((atributo.peek().getTipo().equalsIgnoreCase("variable")&&
                   !tipoExp.equalsIgnoreCase(atributo.peek().getTipoDato()))
+                        || (atributo.peek().getTipo().equalsIgnoreCase("funcion") &&
+                        !atributo.peek().getTipoRetorno().equalsIgnoreCase(tipoExp)))
                 {
                     if(tipoExp.equalsIgnoreCase(""))
                     {
                         System.out.println("ERROR SEMANTICO en la linea "+linea[1]
-                                +" SE QUIERE ASIGNAR A UNA VARIABLE DE TIPO "
-                        +atributo.peek().getTipoDato()+" UN PROCEDIMIENTO ");
+                                +" SE QUIERE ASIGNAR A " +atributo.peek().getNombre()+" UN PROCEDIMIENTO ");
+                        
                         System.exit(0);
                     }
-                    System.out.println("ERROR SEMANTICO en la linea "+linea[1]+" SE QUIERE ASIGNAR A UNA VARIABLE DE TIPO "
+                    else
+                    {
+                        if(atributo.peek().getTipo().equalsIgnoreCase("variable"))
+                        {
+                                  System.out.println("ERROR SEMANTICO en la linea "+linea[1]+" SE QUIERE ASIGNAR A UNA VARIABLE DE TIPO "
                     +atributo.peek().getTipoDato()+" UNA EXPRESION DE TIPO "+tipoExp);
+                    System.exit(0);   
+                        }
+                        else
+                        {
+                             System.out.println("ERROR SEMANTICO en la linea "+linea[1]+" SE QUIERE ASIGNAR UNA EXPRESION DEL TIPO "
+                                     +tipoExp+" A UNA FUNCION QUE RETORNA "+atributo.peek().getTipoRetorno());
                     System.exit(0);
+                        }
+                    }
+                   
                 }
                 
                 mepa.println("ALVL "+manejadorEtiq.getAsignacion());
@@ -1065,7 +1106,8 @@ import java.util.Stack;
                         System.exit(0);
                     }
                    match("parent_cierra",lexico);
-                   mepa.println("LELN");
+                   mepa.println("LEER");
+                   mepa.println("ALVL "+a.getPosMemoria());
 	       }
                else
                {
